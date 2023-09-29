@@ -12,21 +12,6 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     # Set Launch Arguments
-    # パス関係Launch引数
-    # Path_Tree
-    # [place_path]/[data_path]/[bagfile_path] or [waypoint_path] or [branchpoint_path]
-    #   例：
-    #       nakanoshima/
-    #       └── 2023_07_21
-    #           ├── branchpoint
-    #           ├── data_gather_bagfile
-    #           ├── finalwaypoint
-    #           ├── map
-    #           ├── production_bagfile
-    #           ├── remap
-    #           ├── rewaypoint
-    #           └── waypoint
-
     ws_path_arg = DeclareLaunchArgument("ws_path", default_value="whill2_ws")
     place_path_arg = DeclareLaunchArgument("place_path", default_value="nakanoshima")
     data_path_arg = DeclareLaunchArgument("data_path", default_value="2023_07_21")
@@ -36,7 +21,9 @@ def generate_launch_description():
     branchpoint_path_arg = DeclareLaunchArgument("branchpoint_path", default_value="branchpoint")
     bagfile_name_arg = DeclareLaunchArgument("bagfile_name", default_value="bag_test")
     
-    # Include Launch
+    # Include Launchs
+    # WHILLのドライバを起動するLaunch
+    # 引数1：Launchファイルのアドレス
     kuaro_whill_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -49,6 +36,19 @@ def generate_launch_description():
     )
 
     # Nodes
+    # データ保存用ディレクトリ作成用Node
+    # Path_Tree
+    # 例：
+    #     nakanoshima/
+    #     └── 2023_07_21
+    #         ├── branchpoint
+    #         ├── data_gather_bagfile
+    #         ├── finalwaypoint
+    #         ├── map
+    #         ├── production_bagfile
+    #         ├── remap
+    #         ├── rewaypoint
+    #         └── waypoint
     make_dir_node = Node(
         package='make_dir',
         executable='make_dir_node',
