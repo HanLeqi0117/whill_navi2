@@ -18,28 +18,34 @@ class MakeDir(Node):
         self._place_param_ = self.declare_parameter("place_path", "nakanoshima")
         self._data_param_ = self.declare_parameter("data_path", "2023_07_21")
         self._map_path_param_ = self.declare_parameter("map_path", "map")
-        self._bagfile_path_param_ = self.declare_parameter("bagfile_path", "bagfile")
+        self._bagfile_path_param_ = self.declare_parameter("bagfile_path", "bag")
         self._waypoint_path_param_ = self.declare_parameter("waypoint_path", "waypoint")
-        self._dbranchpoint_path_param_ = self.declare_parameter("branchpoint_path", "branchpoint")
+        self._branchpoint_path_param_ = self.declare_parameter("branchpoint_path", "branchpoint")
+
+        map_path = self._map_path_param_.get_parameter_value().string_value
+        bagfile_path = self._bagfile_path_param_.get_parameter_value().string_value
+        waypoint_path = self._waypoint_path_param_.get_parameter_value().string_value
+        branchpoint_path = self._branchpoint_path_param_.get_parameter_value().string_value
 
         # Set variables
         self._prefix_path_ = os.path.join(
             os.path.expanduser("~"),
+            'full_data',
             self._ws_param_.get_parameter_value().string_value,
             self._place_param_.get_parameter_value().string_value,
             self._data_param_.get_parameter_value().string_value
         )
         self._suffix_paths_dict_ = {
-            "map": ["", "re"], 
-            "bagfile": ["data_gather_", "production_"], 
-            "waypoint": ["", "re", "final"], 
-            "branchpoint": [""]
+            map_path: ["", "re"], 
+            bagfile_path: ["data_gather_", "production_"], 
+            waypoint_path: ["", "re", "final"], 
+            branchpoint_path: [""]
         }
         self._suffix_path_key_list_ = [
-            self._map_path_param_.get_parameter_value().string_value,
-            self._bagfile_path_param_.get_parameter_value().string_value,
-            self._waypoint_path_param_.get_parameter_value().string_value,
-            self._dbranchpoint_path_param_.get_parameter_value().string_value
+            map_path,
+            bagfile_path,
+            waypoint_path,
+            branchpoint_path
         ]
 
         self.make_dir()
@@ -70,7 +76,6 @@ def main(args=None):
     # rclpy.spin(MakeDir)
     # rclpy.shutdown()
     node = MakeDir()
-
 
 if __name__ == '__main__':
     main()

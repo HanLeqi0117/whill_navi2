@@ -7,14 +7,15 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-
+from datetime import date
 
 def generate_launch_description():
+
 
     # Set Launch Arguments
     ws_path_arg = DeclareLaunchArgument("ws_path", default_value="whill2_ws")
     place_path_arg = DeclareLaunchArgument("place_path", default_value="nakanoshima")
-    data_path_arg = DeclareLaunchArgument("data_path", default_value="2023_07_21")
+    data_path_arg = DeclareLaunchArgument("data_path", default_value=date.today().isoformat())
     bagfile_path_arg = DeclareLaunchArgument("bagfile_path", default_value="bag")
     map_path_arg = DeclareLaunchArgument("map_path", default_value="map")
     waypoint_path_arg = DeclareLaunchArgument("waypoint_path", default_value="waypoint")
@@ -50,7 +51,7 @@ def generate_launch_description():
     #         ├── rewaypoint
     #         └── waypoint
     make_dir_node = Node(
-        package='make_dir',
+        package='whill_navi2',
         executable='make_dir_node',
         name='make_dir_node',
         parameters=[{
@@ -65,5 +66,13 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-
+        ws_path_arg,
+        place_path_arg,
+        data_path_arg,
+        bagfile_path_arg,
+        map_path_arg,
+        waypoint_path_arg,
+        branchpoint_path_arg,
+        bagfile_name_arg,
+        make_dir_node
     ])
