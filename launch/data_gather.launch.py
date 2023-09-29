@@ -14,7 +14,19 @@ def generate_launch_description():
     # Set Launch Arguments
     # パス関係Launch引数
     # Path_Tree
-    #   [place_path]/[data_path]/[bagfile_path] or [waypoint_path] or [branchpoint_path]
+    # [place_path]/[data_path]/[bagfile_path] or [waypoint_path] or [branchpoint_path]
+    #   例：
+    #       nakanoshima/
+    #       └── 2023_07_21
+    #           ├── branchpoint
+    #           ├── data_gather_bagfile
+    #           ├── finalwaypoint
+    #           ├── map
+    #           ├── production_bagfile
+    #           ├── remap
+    #           ├── rewaypoint
+    #           └── waypoint
+
     ws_path_arg = DeclareLaunchArgument("ws_path", default_value="whill2_ws")
     place_path_arg = DeclareLaunchArgument("place_path", default_value="nakanoshima")
     data_path_arg = DeclareLaunchArgument("data_path", default_value="2023_07_21")
@@ -42,6 +54,7 @@ def generate_launch_description():
         executable='make_dir_node',
         name='make_dir_node',
         parameters=[{
+            "ws_path": LaunchConfiguration("ws_path"),
             "place_path": LaunchConfiguration("place_path"),
             "data_path": LaunchConfiguration("data_path"),
             "map_path": LaunchConfiguration("bagfile_path"),
@@ -50,9 +63,6 @@ def generate_launch_description():
             "branchpoint_path": LaunchConfiguration("branchpoint_path")
         }]
     )
-
-    
-
 
     return LaunchDescription([
 
