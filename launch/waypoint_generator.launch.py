@@ -3,7 +3,9 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, EmitEvent, TimerAction
+from launch.actions import (IncludeLaunchDescription, ExecuteProcess, 
+                            RegisterEventHandler, EmitEvent, TimerAction,
+                            GroupAction)
 from launch.event_handlers import OnProcessStart
 from launch.events import matches_action
 from launch_ros.events import lifecycle
@@ -70,16 +72,21 @@ def generate_launch_description():
         )],
     )
     map_server_lifecycle_node = LifecycleNode(
-        package='nav2_map_server',
-        executable='map_server',
-        name='map_server',
-        namespace='waypoint_generator_launch',        
-        parameters=[os.path.join(
-            launcharg_full_data_path['remap_path_abs'],
-            launcharg_full_data_path['remap_name']
-        )],
-        output='screen'
-    )    
+        package="nav2_map_server",
+        name="map_server",
+        executable="map_server",
+        package="waypoint_generator_launch",
+        parameters=[{
+            "yaml_filename": os.path.join(
+                launcharg_full_data_path["remap_path_abs"],
+                launcharg_full_data_path["remap_name"]
+            )
+        }]
+    )
+    lifecycle_node_group = GroupAction(actions=[
+        amcl_lifecycle_node,
+        map_server_lifecycle_node
+    ])
         
     # Lifecycle Node Configure
     lifecycle_node_configure_event = RegisterEventHandler(
@@ -97,26 +104,24 @@ def generate_launch_description():
                         lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
                         transition_id=Transition.TRANSITION_CONFIGURE
                     )
-                )
-                
+                )                
             ]
         )
     )
     # Lifecycle Node Activate
-    lifecycle_node_activate_event = RegisterEventHandler(
+    acml_lifecycle_node_activate_event = RegisterEventHandler(
         OnStateTransition(
             target_lifecycle_node=map_server_lifecycle_node,
-            start_state='UnConfigured', goal_state='Inactive',
             entities=[
                 EmitEvent(
                     event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
+                        lifecycle_node_matcher=matches_action(amcl_lifecycle_node),
                         transition_id=Transition.TRANSITION_ACTIVATE
                     )
                 ),
                 EmitEvent(
                     event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(amcl_lifecycle_node),
+                        lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
                         transition_id=Transition.TRANSITION_ACTIVATE
                     )
                 ),
@@ -129,18 +134,8 @@ def generate_launch_description():
         )
     )  
             
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
-            
     return LaunchDescription(
-        value_list
+        waypoint_maker_rviz2_node,
+        lifecycle_node_group
     )
 

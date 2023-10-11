@@ -75,28 +75,28 @@ def generate_launch_description():
     )
 
     # Publish LRF static transforms
-    tf2_static_LRF_node = Node(
+    tf2_static_hokuyo_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='laser_front_to_base_link',
         arguments = ['0.46', '0.12', '0.33', '0.0', '0.0', '3.14159', 'base_link', 'laser_front']
     )
     # Publish Velodyne static transforms
-    tf2_static_Velodyne_node = Node(
+    tf2_static_velodyne_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='velodyne_to_base_link',
         arguments = ['0.0', '0.29', '1.09', '0.0', '0.0', '0.0', 'base_link', 'velodyne']
     )
     # Publish IMU static transforms
-    tf2_static_IMU_node = Node(
+    tf2_static_imu_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='imu_to_base_link',
         arguments = ['0.47', '0.46', '0.31', '-1.57079', '0.0', '0.0', 'base_link', 'imu_link']
     )
     # Publish gnss static transforms
-    tf2_static_IMU_node = Node(
+    tf2_static_gnss_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='gnss_to_base_link',
@@ -131,7 +131,7 @@ def generate_launch_description():
     ros2bag_record_event = RegisterEventHandler(
         OnExecutionComplete(
             target_action=make_dir_node,
-            on_start=[
+            on_completion=[
                 LogInfo(msg='Sensors are launched, and then start to record the data.'),
                 ros2bag_record_process
             ]
