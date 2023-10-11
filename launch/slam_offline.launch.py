@@ -25,28 +25,6 @@ def generate_launch_description():
         
     
     # Node
-    slam_offline_node = Node(
-        parameters=[
-            os.path.join(
-                get_package_share_directory("whill_navi2"),
-                'config', 'params', 'slam_offline_node_params.yaml'
-            )
-        ],
-        package='slam_toolbox',
-        executable='sync_slam_toolbox_node',
-        name='sync_slam_toolbox_node',
-        output='screen'
-    )
-    map_saver_cli_lifecycle_node = LifecycleNode(
-        package='nav2_map_server',
-        executable='map_saver_cli',
-        name='map_saver_cli',
-        namespace='slam_offline_launch',
-        arguments=['-f', 
-            launcharg_full_data_path["map_path_abs"],
-            launcharg_full_data_path["map_name"]
-        ]
-    )
     slam_offline_rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -58,6 +36,18 @@ def generate_launch_description():
     )
     
     # ExecutePross
+    slam_offline_process = Node(
+        parameters=[
+            os.path.join(
+                get_package_share_directory("whill_navi2"),
+                'config', 'params', 'slam_offline_node_params.yaml'
+            )
+        ],
+        package='slam_toolbox',
+        executable='sync_slam_toolbox_node',
+        name='sync_slam_toolbox_node',
+        output='screen'
+    )
     ros2bag_play_process = ExecuteProcess(
         cmd=[
             FindExecutable(name='ros2'),
@@ -69,6 +59,16 @@ def generate_launch_description():
             )
         ],
         shell=True
+    )
+    map_saver_cli_process = ExecuteProcess(
+        cmd=[
+            FindExecutable(name='ros2'),
+            'run', 'nav2_map_server', 'map_saver_cli',
+            '-f', os.path.join(
+                launcharg_full_data_path['map_path_abs'],
+                launcharg_full_data_path['map_name']
+            )
+        ]
     )
     mv_map_to_remap_process = ExecuteProcess(
         cmd=[
@@ -83,21 +83,7 @@ def generate_launch_description():
         OnProcessStart(
             target_action=slam_offline_rviz2_node,
             on_start=[
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_node_name(map_saver_cli_lifecycle_node),
-                        transition_id=Transition.TRANSITION_CONFIGURE
-                    )
-                )
-            ]
-        )
-    )
-    activate_node_event = RegisterEventHandler(
-        OnStateTransition(
-            target_lifecycle_node=map_saver_cli_lifecycle_node,
-            start_state='UnConfigured', goal_state='Inactive',
-            entities=[
-                slam_offline_node,
+                slam_offline_process,
                 ros2bag_play_process
             ]
         )
@@ -107,12 +93,7 @@ def generate_launch_description():
             target_action=ros2bag_play_process,
             on_completion=[
                 LogInfo(msg="Bag Play is over, and going to save Map."),
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_node_name(map_saver_cli_lifecycle_node),
-                        transition_id=Transition.TRANSITION_ACTIVATE
-                    )
-                ),
+                map_saver_cli_process,
                 TimerAction(
                     actions=[Shutdown()],
                     period=1.0

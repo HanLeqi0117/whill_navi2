@@ -27,12 +27,13 @@ def generate_launch_description():
     waypoint_maker_node = Node(
         package="waypoint_pkg",
         executable="waypoint_maker",
+        name='waypoint_maker',
         parameters=[
             os.path.join(
                 get_package_share_directory('whill_navi2'),
                 'conifg', 'params', 'waypoint_maker_params.yaml'
             ),
-            {'way_txt_': os.path.join(
+            {'way_txt_file': os.path.join(
                 launcharg_full_data_path['waypoint_path_abs'],
                 launcharg_full_data_path['waypoint_name'])}
         ],
