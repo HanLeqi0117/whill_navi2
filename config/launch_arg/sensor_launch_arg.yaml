@@ -1,0 +1,8 @@
+sensor_launch:
+  use_adis_imu: 'true'
+  use_velodyne: 'true'
+  use_ublox: 'true'
+  use_hokuyo: 'true'
+  use_web_camera: 'true'
+  use_realsense_camera: 'true'
+  use_zed_camera: 'true'

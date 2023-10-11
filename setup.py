@@ -29,7 +29,17 @@ setup(
         (os.path.join(SHARE_DIR, 'launch'), 
             glob(os.path.join('launch', '*launch.py'))),
         (os.path.join(SHARE_DIR, 'launch', 'include'), 
-            glob(os.path.join('launch', 'include', '*launch.py')))
+            glob(os.path.join('launch', 'include', '*launch.py'))),
+        (os.path.join(SHARE_DIR, 'config', 'params'), 
+            glob(os.path.join('config', 'params', '*.yaml'))),
+        (os.path.join(SHARE_DIR, 'config', 'rviz2'), 
+            glob(os.path.join('config', 'rviz2', '*.rviz'))),
+        (os.path.join(SHARE_DIR, 'config', 'launch_arg'), 
+            glob(os.path.join('config', 'launch_arg', '*.yaml'))),
+        (os.path.join(SHARE_DIR, 'config', 'urdf'), 
+            glob(os.path.join('config', 'urdf', '*.urdf'))),       
+        (os.path.join(SHARE_DIR, 'config', 'xacro'), 
+            glob(os.path.join('config', 'xacro', '*.xacro')))        
     ],
     install_requires=['setuptools'],
     zip_safe=True,
