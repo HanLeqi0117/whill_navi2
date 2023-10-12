@@ -18,10 +18,10 @@ def generate_launch_description():
     use_adis_imu_arg = DeclareLaunchArgument("use_adis_imu", default_value="true")
     use_velodyne_arg = DeclareLaunchArgument("use_velodyne", default_value="true")
     use_ublox_arg = DeclareLaunchArgument("use_ublox", default_value="true")
-    use_hokuyo_arg = DeclareLaunchArgument("use_hokuyo", default_value="true")
-    use_web_camera_arg = DeclareLaunchArgument("use_web_camera", default_value="true")
-    use_realsense_camera_arg = DeclareLaunchArgument("use_realsense_camera", default_value="true")
-    use_zed_camera_arg = DeclareLaunchArgument("use_zed_camera", default_value="true")
+    use_hokuyo_arg = DeclareLaunchArgument("use_hokuyo", default_value="false")
+    use_web_camera_arg = DeclareLaunchArgument("use_web_camera", default_value="false")
+    use_realsense_camera_arg = DeclareLaunchArgument("use_realsense_camera", default_value="false")
+    use_zed_camera_arg = DeclareLaunchArgument("use_zed_camera", default_value="false")
 
     launcharg_path = os.path.join(
         get_package_share_directory('whill_navi2'),
@@ -93,7 +93,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('whill_navi2'),
-                'launch', 'include', 'velodyne-all-nodes-VLP16-composed-launch.py'
+                'launch', 'include', 'velodyne-all-nodes-VLP16-launch.py'
             )
         ),
         condition=IfCondition(LaunchConfiguration(use_velodyne_arg.name))        

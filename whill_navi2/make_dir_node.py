@@ -22,7 +22,6 @@ class MakeDir(Node):
         self._bag_path_param_ = self.declare_parameter("bag_path", "bag")
         self._waypoint_path_param_ = self.declare_parameter("waypoint_path", "waypoint")
         self._branchpoint_path_param_ = self.declare_parameter("branchpoint_path", "branchpoint")
-        print(self._date_param_.get_parameter_value().type)
 
         map_path = self._map_path_param_.get_parameter_value().string_value
         bag_path = self._bag_path_param_.get_parameter_value().string_value
@@ -39,7 +38,7 @@ class MakeDir(Node):
         )
         self._suffix_paths_dict_ = {
             map_path: ["", "re"], 
-            bag_path: ["data_gather_", "production_"], 
+            bag_path: ["production_"], 
             waypoint_path: ["", "re", "final"], 
             branchpoint_path: [""]
         }
@@ -104,8 +103,7 @@ def main(args=None):
                     'config', 'launch_arg', 'full_data_path_launch_arg.yaml'
                 ), 'w') as f:
                 yaml.safe_dump(launcharg_full_data_path, f)
-                    
     rclpy.shutdown()
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()

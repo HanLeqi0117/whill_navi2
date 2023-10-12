@@ -52,7 +52,7 @@ def generate_launch_description():
         output='screen',
         namespace='whill',
         parameters=[ros2_whill_yaml_path],
-        remappings=[('controller/cmd_vel', 'cmd_vel')]
+        remappings=[('whill/control/cmd_vel', 'cmd_vel')]
     )
     joy_node = Node(
         package='joy',

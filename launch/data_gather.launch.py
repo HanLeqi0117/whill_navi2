@@ -3,7 +3,7 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, FindExecutable
 from launch.event_handlers import OnExecutionComplete, OnProcessStart
@@ -79,29 +79,48 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         name='laser_front_to_base_link',
-        arguments = ['0.46', '0.12', '0.33', '0.0', '0.0', '3.14159', 'base_link', 'laser_front']
+        arguments = [
+            '--x', '0.46', '--y', '0.12', '-z', '0.33', 
+            '--roll', '0.0', '--ptich', '0.0', '--yaw', '3.14159', 
+            '--frame-id', 'base_link', '--child-frame-id', 'laser_front'
+        ]  
     )
     # Publish Velodyne static transforms
     tf2_static_velodyne_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='velodyne_to_base_link',
-        arguments = ['0.0', '0.29', '1.09', '0.0', '0.0', '0.0', 'base_link', 'velodyne']
+        arguments = [
+            '--x', '0.0', '--y', '0.29', '-z', '1.09', 
+            '--roll', '0.0', '--ptich', '0.0', '--yaw', '0.0', 
+            '--frame-id', 'base_link', '--child-frame-id', 'velodyne'
+        ]  
     )
+   
     # Publish IMU static transforms
     tf2_static_imu_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='imu_to_base_link',
-        arguments = ['0.47', '0.46', '0.31', '-1.57079', '0.0', '0.0', 'base_link', 'imu_link']
+        arguments = [
+            '--x', '0.47', '--y', '0.46', '-z', '0.31', 
+            '--roll', '-1.57079', '--ptich', '0.0', '--yaw', '0.0', 
+            '--frame-id', 'base_link', '--child-frame-id', 'imu_link'
+        ] 
     )
-    # Publish gnss static transforms
+
+   # Publish gnss static transforms
     tf2_static_gnss_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='gnss_to_base_link',
-        arguments = ['0.71', '0.24', '0.12', '0.0', '0.0', '0.0', 'base_link', 'imu_link']
+        arguments = [
+            '--x', '0.71', '--y', '0.24', '-z', '0.12', 
+            '--roll', '0.0', '--ptich', '0.0', '--yaw', '0.0', 
+            '--frame-id', 'base_link', '--child-frame-id', 'gnss'
+        ]
     )
+
     # robot_localization pkg EKF odometry
     ekf_odometry_node = Node(
         package='robot_localization',
@@ -121,19 +140,23 @@ def generate_launch_description():
             os.path.join(
                 os.environ['HOME'],
                 nodeparams_make_dir['ws_path'],
+                "full_data",
                 str(nodeparams_make_dir['date_path']),
                 nodeparams_make_dir['place_path'],
-                nodeparams_make_dir['bag_path'],
-                nodeparams_make_dir['bag_name'],
+                nodeparams_make_dir["bag_path"]
             )
         ]
     )
     ros2bag_record_event = RegisterEventHandler(
-        OnExecutionComplete(
+        OnProcessStart(
             target_action=make_dir_node,
-            on_completion=[
+            on_start=[
                 LogInfo(msg='Sensors are launched, and then start to record the data.'),
-                ros2bag_record_process
+                TimerAction(
+                    actions=[
+                        ros2bag_record_process],
+                    period=1.0
+                )
             ]
         )
     )
@@ -150,17 +173,25 @@ def generate_launch_description():
         ]
     )
 
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
-            
-    return LaunchDescription(
-        value_list
+    node_group = GroupAction(actions=[
+        make_dir_node,
+        tf2_static_imu_node,
+        tf2_static_gnss_node,
+        tf2_static_hokuyo_node,
+        tf2_static_velodyne_node,
+        ekf_odometry_node,
+        rviz2_node
+    ])
+
+    launch_group = GroupAction(
+        actions=[
+            sensor_launch,
+            kuaro_whill_launch
+        ]
     )
+
+    return LaunchDescription([        
+        ros2bag_record_event,
+        node_group,
+        launch_group
+    ])

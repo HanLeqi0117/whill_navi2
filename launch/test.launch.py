@@ -15,32 +15,35 @@ from launch_ros.events import lifecycle
 from lifecycle_msgs.msg import Transition, TransitionEvent
 from launch_ros.event_handlers import OnStateTransition
 
+# input: path of directory.
+# output: list of the flie names in the directory
 def list_files_in_directory(path):
     file_list = []
     for root, dirs, files in os.walk(path):
         for file in files:
             file_list.append(file)
-    return sorted(file_list)  # ファイル名でソートしたリストを返す
+    return sorted(file_list)
 
 def generate_launch_description():
-    # ファイルを読み取りたいディレクトリのパスを指定
-    directory_path = '/home/han/whill2_ws/full_data/2023_10_09/nakanoshima/rewaypoint'  # ディレクトリのパスを適切に置き換えてください
 
-    if os.path.exists(directory_path) and os.path.isdir(directory_path):
-        file_list = list_files_in_directory(directory_path)
-        if file_list:
-            for file_name in file_list:
-                print(file_name)
+    with open(os.path.join(
+        get_package_share_directory("whill_navi2"),
+        "config", "launch_arg", "full_data_path_launch_arg.yaml"
+    )) as f:
+        launcharg_full_data_path = yaml.safe_load(f)["full_data_path_launch"]
+
+    file_names = list_files_in_directory(launcharg_full_data_path["bag_path_abs"])
+    for file_name in file_names:
+        if file_names.count() == 0:
+            bag_path = launcharg_full_data_path["bag_file"]
         else:
-            print("ディレクトリ内にファイルが見つかりません。")
-    else:
-        print("指定したディレクトリが存在しないか、ディレクトリではありません。")            
+            read_file_path = launcharg_full_data_path["rewaypoint_path_abs"]
+            write_file_path = read_file_path = launcharg_full_data_path["rewaypoint_path_abs"]
+            read_file_name = file_names[-1]
+            write_file_name = str(file_names.count()) + launcharg_full_data_path["rewaypoint_name"]
+
     return LaunchDescription([
-        # slam_offline_rviz2_node,
-        # map_saver_cli_lifecycle_node,
-        # map_saver_cli_lifecycle_node_configure_event,
-        # map_saver_cli_lifecycle_node_activate_event,
-        # mv_map_to_remap_event
+
     ])
     
 if __name__ == "__main__":

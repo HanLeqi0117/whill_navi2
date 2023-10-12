@@ -55,8 +55,7 @@ def generate_launch_description():
             'bag',
             'play',
             os.path.join(
-                launcharg_full_data_path["bag_path_abs"],
-                launcharg_full_data_path["bag_name"]
+                launcharg_full_data_path["bag_path_abs"]
             )
         ],
         shell=True

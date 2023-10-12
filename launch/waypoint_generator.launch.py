@@ -43,10 +43,9 @@ def generate_launch_description():
     )
     ros2bag_play_process = ExecuteProcess(
         cmd=[
-            FindExecutable(name="ros2"),
-            'bag', 'play', os.path.join(
-                launcharg_full_data_path['bag_path_abs'],
-                launcharg_full_data_path['bag_name']
+                FindExecutable(name="ros2"),
+                'bag', 'play', os.path.join(
+                launcharg_full_data_path['bag_path_abs']
             )
         ]
     )

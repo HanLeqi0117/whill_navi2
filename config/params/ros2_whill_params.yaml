@@ -12,7 +12,7 @@ whill/ros2_whill:
     init_speed/turn/speed: 0.8        # [rad/s]
     init_speed/turn/acc: 0.79         # [rad/ss]
     init_speed/turn/dec: 1.8          # [rad/ss]
-    use_gui: true
+    use_gui: false
     send_interval: 20
     keep_connected: true 
     serial_port: /dev/ttyUSB0
