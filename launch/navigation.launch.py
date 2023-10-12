@@ -30,18 +30,6 @@ def generate_launch_description():
         
         
     # Node
-    map_server_node = Node(
-        package="nav2_map_server",
-        executable="map_server",
-        name="map_server",
-        output="screen",
-        parameters=[{
-            "yaml_filepath": os.path.join(
-                launcharg_full_data_path["remap_path_abs"],
-                launcharg_full_data_path["remap_name"]
-            )
-        }]
-    )
     navigation_rviz2_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -86,7 +74,19 @@ def generate_launch_description():
             )
         ]
     )
-    
+    map_server_node = LifecycleNode(
+        package="nav2_map_server",
+        executable="map_server",
+        name="map_server",
+        output="screen",
+        parameters=[{
+            "yaml_filepath": os.path.join(
+                launcharg_full_data_path["remap_path_abs"],
+                launcharg_full_data_path["remap_name"]
+            )
+        }]
+    )
+        
     # Launch
     sensor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
