@@ -13,10 +13,13 @@ def generate_launch_description():
 
     # Declare launch arguments
     general_debug_arg = DeclareLaunchArgument(name="debug", default_value='true')
+
     f9p_use_rtk_arg = DeclareLaunchArgument(name="use_rtk", default_value='false')
     f9p_port_arg = DeclareLaunchArgument(name="port", default_value="/dev/ttyACM0")
+    
     ntrip_check_gga_arg = DeclareLaunchArgument(name="check_gga", default_value='false')
     ntrip_mountpoint_arg = DeclareLaunchArgument(name="mountpoint", default_value="32M4NHS")
+    frame_id_arg = DeclareLaunchArgument(name="frame_id", default_value="gnss")
 
     # Find the Path of params
     params_path = os.path.join(
@@ -39,7 +42,8 @@ def generate_launch_description():
             {
                 "debug": LaunchConfiguration("debug"),
                 "use_rtk": LaunchConfiguration("use_rtk"),
-                "port": LaunchConfiguration("port")
+                "port": LaunchConfiguration("port"),
+                "frame_id": LaunchConfiguration("frame_id")
             }
         ]
     )
@@ -66,18 +70,15 @@ def generate_launch_description():
             ("nmea_sentence", "nmea")
         ]
     )
-
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
-            
-    return LaunchDescription(
-        value_list
-    )
+        
+    return LaunchDescription([
+        frame_id_arg,
+        ntrip_mountpoint_arg,
+        ntrip_check_gga_arg,
+        f9p_port_arg,
+        f9p_use_rtk_arg,
+        general_debug_arg,
+        navsat_node,
+        ntrip_node,
+        f9p_node,
+    ])

@@ -120,6 +120,13 @@ def generate_launch_description():
         )
     )
 
+    return LaunchDescription([
+        slam_offline_rviz2_node,
+        map_saver_cli_lifecycle_node_configure_event,
+        map_saver_cli_lifecycle_node_activate_event,
+        mv_map_to_remap_event
+    ])
+
 
 # test
 # if __name__ == '__main__':

@@ -37,13 +37,14 @@ import yaml
 import ament_index_python.packages
 import launch
 import launch_ros.actions
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, EmitEvent
+import launch.event_handlers 
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
 
-    with_rviz_arg = DeclareLaunchArgument(name="with_rviz", default_value="false")
+    with_rviz_arg = DeclareLaunchArgument(name="with_rviz", default_value="true")
 
     rviz_file_dir = os.path.join(ament_index_python.packages.get_package_share_path("whill_navi2"), "config", "rviz2", "velodyne.rviz")
     velodyne_rviz_node = launch_ros.actions.Node(

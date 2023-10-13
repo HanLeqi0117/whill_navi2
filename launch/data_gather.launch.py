@@ -80,8 +80,8 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='laser_front_to_base_link',
         arguments = [
-            '--x', '0.46', '--y', '0.12', '-z', '0.33', 
-            '--roll', '0.0', '--ptich', '0.0', '--yaw', '3.14159', 
+            '--x', '0.50', '--y', '0.0', '--z', '0.33', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '3.14159', 
             '--frame-id', 'base_link', '--child-frame-id', 'laser_front'
         ]  
     )
@@ -91,8 +91,8 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='velodyne_to_base_link',
         arguments = [
-            '--x', '0.0', '--y', '0.29', '-z', '1.09', 
-            '--roll', '0.0', '--ptich', '0.0', '--yaw', '0.0', 
+            '--x', '0.0', '--y', '0.0', '--z', '0.8875', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
             '--frame-id', 'base_link', '--child-frame-id', 'velodyne'
         ]  
     )
@@ -103,9 +103,9 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='imu_to_base_link',
         arguments = [
-            '--x', '0.47', '--y', '0.46', '-z', '0.31', 
-            '--roll', '-1.57079', '--ptich', '0.0', '--yaw', '0.0', 
-            '--frame-id', 'base_link', '--child-frame-id', 'imu_link'
+            '--x', '0.44', '--y', '0.23', '--z', '0.2575', 
+            '--roll', '-1.57079', '--pitch', '0.0', '--yaw', '0.0', 
+            '--frame-id', 'base_link', '--child-frame-id', 'imu'
         ] 
     )
 
@@ -115,8 +115,8 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='gnss_to_base_link',
         arguments = [
-            '--x', '0.71', '--y', '0.24', '-z', '0.12', 
-            '--roll', '0.0', '--ptich', '0.0', '--yaw', '0.0', 
+            '--x', '0.71', '--y', '0.0', '--z', '0.0175', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
             '--frame-id', 'base_link', '--child-frame-id', 'gnss'
         ]
     )
@@ -153,8 +153,7 @@ def generate_launch_description():
             on_start=[
                 LogInfo(msg='Sensors are launched, and then start to record the data.'),
                 TimerAction(
-                    actions=[
-                        ros2bag_record_process],
+                    actions=[ros2bag_record_process],
                     period=1.0
                 )
             ]
@@ -173,25 +172,15 @@ def generate_launch_description():
         ]
     )
 
-    node_group = GroupAction(actions=[
+    return LaunchDescription([        
+        ros2bag_record_event,
         make_dir_node,
         tf2_static_imu_node,
         tf2_static_gnss_node,
         tf2_static_hokuyo_node,
         tf2_static_velodyne_node,
         ekf_odometry_node,
-        rviz2_node
-    ])
-
-    launch_group = GroupAction(
-        actions=[
-            sensor_launch,
-            kuaro_whill_launch
-        ]
-    )
-
-    return LaunchDescription([        
-        ros2bag_record_event,
-        node_group,
-        launch_group
+        rviz2_node,
+        sensor_launch,
+        kuaro_whill_launch        
     ])

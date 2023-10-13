@@ -4,7 +4,7 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription, LaunchContext
 from launch.actions import DeclareLaunchArgument
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition
@@ -18,7 +18,7 @@ def generate_launch_description():
     use_adis_imu_arg = DeclareLaunchArgument("use_adis_imu", default_value="true")
     use_velodyne_arg = DeclareLaunchArgument("use_velodyne", default_value="true")
     use_ublox_arg = DeclareLaunchArgument("use_ublox", default_value="true")
-    use_hokuyo_arg = DeclareLaunchArgument("use_hokuyo", default_value="false")
+    use_hokuyo_arg = DeclareLaunchArgument("use_hokuyo", default_value="true")
     use_web_camera_arg = DeclareLaunchArgument("use_web_camera", default_value="false")
     use_realsense_camera_arg = DeclareLaunchArgument("use_realsense_camera", default_value="false")
     use_zed_camera_arg = DeclareLaunchArgument("use_zed_camera", default_value="false")
@@ -96,23 +96,24 @@ def generate_launch_description():
                 'launch', 'include', 'velodyne-all-nodes-VLP16-launch.py'
             )
         ),
+        launch_arguments=[["with_rviz", "false"]],
         condition=IfCondition(LaunchConfiguration(use_velodyne_arg.name))        
-    )        
-    
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
-            
-    return LaunchDescription(
-        value_list
     )
+
+    return LaunchDescription([
+        use_adis_imu_arg,
+        use_velodyne_arg,
+        use_ublox_arg,
+        use_hokuyo_arg,
+        use_web_camera_arg,
+        use_realsense_camera_arg,
+        use_zed_camera_arg,
+        velodyne_launch,
+        web_camera_launch,
+        hokuyo_lrf_launch,
+        ublox_gnss_launch,
+        adis_imu_launch    
+    ])
 # test
 # if __name__ == '__main__':
 #     generate_launch_description()
