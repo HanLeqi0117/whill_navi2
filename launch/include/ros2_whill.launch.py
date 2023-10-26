@@ -3,7 +3,7 @@ import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, GroupAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -13,7 +13,7 @@ def generate_launch_description():
     # xacro, urdf, yamlファイルパスを記述する
     # modelc.urdf.xacroの内容は、XML言語でWHILLのモデルを記述するものである
     whill_model_xacro_path = os.path.join(
-        get_package_share_directory("ros2_whill"),
+        get_package_share_directory("whill_navi2"),
         'config',
         'xacro',
         'modelc.urdf.xacro'
@@ -21,7 +21,7 @@ def generate_launch_description():
 
     # .xacroファイルはマクロ変数が入っているため、直接にロボットパブリッシュのパッケージに読まれることができないため、.xacroファイルから.urdfファイルに変換する必要があります。
     whill_model_urdf_path = os.path.join(
-        get_package_share_directory("ros2_whill"),
+        get_package_share_directory("whill_navi2"),
         'config',
         'xacro',
         'modelc.urdf'
@@ -29,11 +29,12 @@ def generate_launch_description():
 
     # .yamlファイルの内容は、XML言語でWHILLのパラメータを記述するものである
     ros2_whill_yaml_path = os.path.join(
-        get_package_share_directory('ros2_whill'),
+        get_package_share_directory('whill_navi2'),
         'config',
         'params',
         'initial_speedprofile.yaml'
     )
+    
 
     # xacroファイルに基づき、urdfのドキュメントオブジェクトを生成する
     whill_model_urdf_doc = xacro.process_file(whill_model_xacro_path)
@@ -64,6 +65,7 @@ def generate_launch_description():
     enable_cmd_vel_topic_arg = DeclareLaunchArgument('enable_cmd_vel_topic', default_value='true')
     odometry_topic_name_arg = DeclareLaunchArgument('odometry_topic_name', default_value='odometry')
     
+    
     # 起動するノードのオブジェクトの宣言
     robot_state_publisher_node = Node(
         package='robot_state_publisher',                                # パッケージの名前
@@ -74,7 +76,6 @@ def generate_launch_description():
         remappings=[('/joint_states', '/whill/states/jointState')],     # トピックのremap
         output='screen'                                                 # ログをコンソール画面に出力する
     )
-    
     ros2_whill_node = Node(
         package='ros2_whill',
         executable='ros2_whill',
@@ -90,21 +91,26 @@ def generate_launch_description():
              'enable_cmd_vel_topic': LaunchConfiguration('enable_cmd_vel_topic'),
              'odometry_topic_name': LaunchConfiguration('odometry_topic_name')}.items()
         ],
-        remappings=[('controller/cmd_vel', 'cmd_vel')]
+        remappings=[('whill/controller/cmd_vel', 'cmd_vel')]
     )
-    
-    # 上記の宣言したLaunch引数オブジェクトとNodeのオブジェクトをリストに記入する
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
+
+    # Group
+    arg_group = GroupAction(actions=[
+        gui_arg,
+        send_interval_arg,
+        keep_connected_arg,
+        serial_port_arg,
+        publish_tf_arg,
+        enable_cmd_vel_topic_arg,
+        odometry_topic_name_arg
+    ])
+    node_group = GroupAction(actions=[
+        robot_state_publisher_node,
+        ros2_whill_node,
+        
+    ])    
             
-    return LaunchDescription(
-        value_list
-    )
+    return LaunchDescription([
+        arg_group,
+        node_group
+    ])

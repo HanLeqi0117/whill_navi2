@@ -4,6 +4,24 @@ from ament_index_python.packages import get_package_share_directory
 import os
 import yaml
 
+#
+# データ保存用ディレクトリ作成用Node
+# Path_Tree
+# 例：
+# $HOME/$WORKSPACE
+# └── full_data
+#     └── date_today
+#         └── nakanoshima
+#             ├── branchpoint
+#             ├── data_gather_bag
+#             ├── finalwaypoint
+#             ├── map
+#             ├── production_bag
+#             ├── remap
+#             ├── rewaypoint
+#             └── waypoint
+#
+
 
 class MakeDir(Node):
     def __init__(self):
@@ -38,7 +56,7 @@ class MakeDir(Node):
         )
         self._suffix_paths_dict_ = {
             map_path: ["", "re"], 
-            bag_path: ["production_"], 
+            bag_path: ["backup_", "production_"], 
             waypoint_path: ["", "re", "final"], 
             branchpoint_path: [""]
         }
@@ -82,7 +100,7 @@ def main(args=None):
         get_package_share_directory('whill_navi2'),
         'config', 'params', 'make_dir_node_params.yaml'
     )
-        
+
     with open(paramspath_make_dir) as f:
         nodeparams_make_dir = yaml.safe_load(f)['make_dir_node']['ros__parameters']
         base_path = os.path.join(
@@ -103,6 +121,7 @@ def main(args=None):
                     'config', 'launch_arg', 'full_data_path_launch_arg.yaml'
                 ), 'w') as f:
                 yaml.safe_dump(launcharg_full_data_path, f)
+    
     rclpy.shutdown()
 
 if __name__ == '__main__':

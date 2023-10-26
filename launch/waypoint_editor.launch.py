@@ -14,7 +14,7 @@ from launch_ros.actions import Node, LifecycleNode
 from lifecycle_msgs.msg import Transition
 
 # input: path of directory.
-# output: list of the flie names in the directory
+# output: list of the flie names in the path
 def list_files_in_directory(path):
     file_list = []
     for root, dirs, files in os.walk(path):

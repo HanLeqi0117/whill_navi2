@@ -5,7 +5,7 @@ import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
@@ -29,7 +29,18 @@ def generate_launch_description():
         'params',
         'ros2_whill_params.yaml'
     )
-
+    whill_joy2_params_path = os.path.join(
+        get_package_share_directory('whill_navi2'),
+        'config',
+        'params',
+        'whill_joy2_params.yaml'
+    )
+    
+    whill_joy_state_arg = DeclareLaunchArgument(name="whill_joy_state", default_value="whill/states/joy")
+    whill_joy_control_arg = DeclareLaunchArgument(name='whill_joy_control', default_value="whill/controller/joy")
+    ros2_whill_cmd_vel_arg = DeclareLaunchArgument(name='ros2_whill_cmd_vel', default_value='whill/controller/cmd_vel')
+    whill_joy2_cmd_vel_arg = DeclareLaunchArgument(name='whill_joy2_cmd_vel', default_value='whill_joy2/cmd_vel')
+    
     whill_model_urdf_file = xacro.process_file(whill_model_xacro_path)
     robot_description = whill_model_urdf_file.toprettyxml(indent='\t')
     with open(whill_model_urdf_path, "w") as urdf_file:
@@ -52,27 +63,46 @@ def generate_launch_description():
         output='screen',
         namespace='whill',
         parameters=[ros2_whill_yaml_path],
-        remappings=[('whill/control/cmd_vel', 'cmd_vel')]
+        remappings=[
+            ('controller/cmd_vel', LaunchConfiguration(ros2_whill_cmd_vel_arg.name))
+        ]
     )
     joy_node = Node(
         package='joy',
         executable='joy_node',
         name='joy_node',
-        remappings=[('joy', 'whill/controller/joy')],
+        remappings=[('joy', LaunchConfiguration(whill_joy_control_arg.name))],
         output='screen'
     )
-    
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
-            
-    return LaunchDescription(
-        value_list
+    whill_joy2_node = Node(
+        package='ros2_whill',
+        executable='whill_joy2',
+        name='whill_joy2',
+        output='screen',
+        parameters=[whill_joy2_params_path],
+        remappings=[
+            ('joy_state', LaunchConfiguration(whill_joy_state_arg.name)),
+            ('controller/joy', LaunchConfiguration(whill_joy_control_arg.name)),
+            ('controller/cmd_vel', LaunchConfiguration(whill_joy2_cmd_vel_arg.name))
+        ]
     )
+    
+    # Group
+    arg_group = GroupAction(actions=[
+        whill_joy_state_arg,
+        whill_joy_control_arg,
+        ros2_whill_cmd_vel_arg,
+        whill_joy2_cmd_vel_arg,
+    ])
+    node_group = GroupAction(actions=[
+        robot_state_publisher_node,
+        ros2_whill_node,
+        joy_node,
+        whill_joy2_node
+    ])
+        
+            
+    return LaunchDescription([
+        arg_group,
+        node_group
+    ])

@@ -9,7 +9,7 @@ make_dir_node:
     branchpoint_path: branchpoint
     rewaypoint_path: rewaypoint
     remap_path: remap_path
-    bag_name: bag_0.db3
+    bag_name: bag_ros2
     map_name: map
     remap_name: remap.yaml
     waypoint_name: waypoint.txt

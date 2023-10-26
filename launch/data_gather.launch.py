@@ -1,21 +1,28 @@
 import os
 import yaml
+import shutil
+import datetime
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, FindExecutable
-from launch.event_handlers import OnExecutionComplete, OnProcessStart
+from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
-from datetime import date
+
+# input: path of directory.
+# output: list of the directory names in the path
+def list_files_in_directory(path):
+    dir_list = []
+    for root, dirs, files in os.walk(path):
+        for dir in dirs:
+            dir_list.append(dir)
+    return sorted(dir_list)
 
 def generate_launch_description():
-    
-    # Set Launch Arguments
-    use_gnss_localization_arg =  DeclareLaunchArgument("use_gnss_localization", default_value="false")
-    
+       
     launcharg_path = os.path.join(
         get_package_share_directory('whill_navi2'),
         'config', 'launch_arg', 'sensor_launch_arg.yaml'
@@ -23,15 +30,42 @@ def generate_launch_description():
     with open(launcharg_path) as f:
         launcharg_sensor = yaml.safe_load(f)['sensor_launch']
     
+    launcharg_path = os.path.join(
+        get_package_share_directory('whill_navi2'),
+        'config', 'launch_arg', 'kuaro_whill_launch_arg.yaml'
+    )
+    with open(launcharg_path) as f:
+        launcharg_kuaro_whill = yaml.safe_load(f)['kuaro_whill_launch']
+    
     paramspath_make_dir = os.path.join(
         get_package_share_directory('whill_navi2'),
         'config', 'params', 'make_dir_node_params.yaml'
     ) 
     with open(paramspath_make_dir) as f:
         nodeparams_make_dir = yaml.safe_load(f)['make_dir_node']['ros__parameters']
-            
-    #Include Launch File
-    #sensor Launch
+    
+    bag_path = os.path.join(
+        os.environ['HOME'],
+        nodeparams_make_dir['ws_path'],
+        'full_data',
+        str(nodeparams_make_dir['date_path']),
+        nodeparams_make_dir['place_path'],
+        nodeparams_make_dir['bag_path']
+    )
+    
+    # if bag_file in bag_path, remove existed bag_file
+    if os.path.exists(bag_path):
+        bag_files_list = list_files_in_directory(bag_path)
+        if bag_files_list.count() > 0:
+            for bag_file in bag_files_list:
+                shutil.rmtree(bag_file)
+    
+    ##########################################################################################        
+    ########################################## ROS API #######################################
+    ##########################################################################################        
+    
+    # Include Launch File
+    # sensor Launch
     sensor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -41,40 +75,24 @@ def generate_launch_description():
         ),
         launch_arguments=launcharg_sensor.items()
     )
-    #kuaro_whill Launch
+    # kuaro_whill Launch
     kuaro_whill_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('whill_navi2'),
                 'launch', 'include', 'kuaro_whill.launch.py'
             )
-        )
+        ),
+        launch_arguments=launcharg_kuaro_whill.items()
     )
     
-    # Nodes
-    # データ保存用ディレクトリ作成用Node
-    # Path_Tree
-    # 例：
-    # $HOME/$WORKSPACE
-    # └── full_data
-    #     └── date_today
-    #         └── nakanoshima
-    #             ├── branchpoint
-    #             ├── data_gather_bag
-    #             ├── finalwaypoint
-    #             ├── map
-    #             ├── production_bag
-    #             ├── remap
-    #             ├── rewaypoint
-    #             └── waypoint
+    # Node
     make_dir_node = Node(
         package='whill_navi2',
         executable='make_dir_node',
         name='make_dir_node',
         parameters=[paramspath_make_dir]
     )
-
-    # Publish LRF static transforms
     tf2_static_hokuyo_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -85,7 +103,6 @@ def generate_launch_description():
             '--frame-id', 'base_link', '--child-frame-id', 'laser_front'
         ]  
     )
-    # Publish Velodyne static transforms
     tf2_static_velodyne_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -96,8 +113,6 @@ def generate_launch_description():
             '--frame-id', 'base_link', '--child-frame-id', 'velodyne'
         ]  
     )
-   
-    # Publish IMU static transforms
     tf2_static_imu_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -108,8 +123,6 @@ def generate_launch_description():
             '--frame-id', 'base_link', '--child-frame-id', 'imu'
         ] 
     )
-
-   # Publish gnss static transforms
     tf2_static_gnss_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -120,8 +133,6 @@ def generate_launch_description():
             '--frame-id', 'base_link', '--child-frame-id', 'gnss'
         ]
     )
-
-    # robot_localization pkg EKF odometry
     ekf_odometry_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -133,9 +144,23 @@ def generate_launch_description():
             )
         ]
     )
-    # ros2bag
+    rviz2_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='datagather_rviz2_node',
+        arguments=[
+            '-d',
+            os.path.join(
+                get_package_share_directory('whill_navi2'), 
+                'config', 'rviz2', 'data_gather_launch.rviz'
+            )
+        ]
+    )
+    
+    # Process
     ros2bag_record_process = ExecuteProcess(
-        cmd=[FindExecutable(name='ros2'),
+        cmd=[
+            FindExecutable(name='ros2'),
             'bag', 'record', '--all', '-o', 
             os.path.join(
                 os.environ['HOME'],
@@ -147,40 +172,66 @@ def generate_launch_description():
             )
         ]
     )
+    ros2bag_backup_process = ExecuteProcess(
+        cmd=[
+            "cp", "-r", 
+            os.path.join(bag_path, nodeparams_make_dir['bag_name']),
+            os.path.join(
+                bag_path, '..', 
+                'backup_bag',
+                'backup_bag' + 
+                    '_{:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
+            )
+        ]
+    )
+    # Event
     ros2bag_record_event = RegisterEventHandler(
         OnProcessStart(
-            target_action=make_dir_node,
+            target_action=action_group,
             on_start=[
                 LogInfo(msg='Sensors are launched, and then start to record the data.'),
                 TimerAction(
                     actions=[ros2bag_record_process],
-                    period=1.0
+                    period=0.5
                 )
             ]
         )
     )
-    
-    #rviz
-    rviz2_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='datagather_rviz2_node',
-        arguments=['-d', os.path.join(
-                get_package_share_directory('whill_navi2'), 
-                'config', 'rviz2', 'data_gather_launch.rviz'
-            )
-        ]
+    shutdown_event = RegisterEventHandler(
+        OnShutdown(
+            on_shutdown=[
+                LogInfo(msg='Copy bag_file to $(bag_path)/back_up for Backup.'),
+                ros2bag_backup_process
+            ]
+        )
     )
-
-    return LaunchDescription([        
-        ros2bag_record_event,
+    
+    # Launch Group
+    launch_group = GroupAction(actions=[
+        sensor_launch,
+        kuaro_whill_launch
+    ])
+    # Node Group
+    node_group = GroupAction(actions=[
         make_dir_node,
-        tf2_static_imu_node,
-        tf2_static_gnss_node,
         tf2_static_hokuyo_node,
         tf2_static_velodyne_node,
+        tf2_static_imu_node,
+        tf2_static_gnss_node,
         ekf_odometry_node,
-        rviz2_node,
-        sensor_launch,
-        kuaro_whill_launch        
+        rviz2_node
+    ])    
+    # Action Group
+    action_group = GroupAction(actions=[
+        node_group,
+        launch_group
+    ])
+    # Event Group
+    event_group = GroupAction(actions=[
+        ros2bag_record_event,
+        shutdown_event
+    ])
+
+    return LaunchDescription([    
+        event_group     
     ])
