@@ -2,7 +2,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, GroupAction
 from launch.substitutions import LaunchConfiguration, TextSubstitution
 from launch_ros.actions import Node
 from launch.conditions import IfCondition
@@ -16,17 +16,20 @@ def generate_launch_description():
         "urdf",
         "adis16470_breakout.urdf"
     )
-
     imu_rviz_file_path = os.path.join(
         get_package_share_directory("whill_navi2"),
         "config",
         "rviz2",
         "adis_imu.rviz"
     )
-
     # ファイルを開き、内容を変数に納める
     with open(imu_urdf_file_path, "r") as imu_urdf_file:
             robot_description = imu_urdf_file.read()
+            
+            
+##############################################################################################        
+########################################## ROS API ###########################################
+############################################################################################## 
 
     # Launchの引数オブジェクトを宣言する
     # IMUのデータをフィルタで処理するかどうか。Trueの場合、処理する。Falseの場合、処理しない。
@@ -78,7 +81,6 @@ def generate_launch_description():
         }],
         output="screen"                                                 # ターミナルにLogを出力する
     )
-
     # IMUのデータフィルタを起動する
     imu_filter_node = Node(
         package="imu_filter_madgwick",                                  # パッケージの名前
@@ -91,7 +93,6 @@ def generate_launch_description():
         }],
         condition=IfCondition(LaunchConfiguration("with_filter"))       # ノードの実行条件
     )
-
     # Rvizを起動する
     rviz_node = Node(
         package="rviz2",                                                # パッケージの名前
@@ -100,7 +101,6 @@ def generate_launch_description():
         arguments=["-d", imu_rviz_file_path],                           # ターミナルの引数
         condition=IfCondition(LaunchConfiguration("with_rviz"))         # ノードの実行条件
     )
-
     # Plotを起動する(ジャイロセンサ情報表示)
     gyro_plot_node = Node(
         package="rqt_plot",                                             # パッケージの名前
@@ -119,20 +119,33 @@ def generate_launch_description():
         namespace="plot",                                               # ノードのネームスペース
         arguments=["/imu/data_raw/linear_accleration/x:y:z"],           # ターミナルの引数
         condition=IfCondition(LaunchConfiguration("with_plot"))         # ノードの実行条件
-    )
+    )  
+          
+    # Argument Group
+    arg_group = GroupAction(actions=[
+        with_filter_arg,
+        with_rviz_arg,
+        with_plot_arg,
+        imu_device_arg,
+        frame_id_arg,
+        burst_read_arg,
+        publish_temperature_arg,
+        rate_arg,
+        publish_tf_arg,
+        publish_debug_topics_arg,
+        use_mag_arg
+    ])
+    # Node Group
+    node_group = GroupAction(actions=[
+        accl_plot_node,
+        gyro_plot_node,
+        rviz_node,
+        imu_filter_node,
+        imu_node,
+        robot_state_publisher_node,
+    ])
 
-    # すべてのLaunchの要素をLaunchDescriptionのインスタンスにまとめ、発火する
-    name_dict = locals()
-    value_list = []
-    for name, value in name_dict.items():
-        if ("_arg") in name \
-        or ("_node") in name \
-        or ("_launch") in name \
-        or ("_event") in name:
-            # test
-            # print(name, type(value))
-            value_list.append(value)
-            
-    return LaunchDescription(
-        value_list
-    )
+    return LaunchDescription([    
+        arg_group,
+        node_group  
+    ])

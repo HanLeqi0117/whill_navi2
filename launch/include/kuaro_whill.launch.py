@@ -35,16 +35,22 @@ def generate_launch_description():
         'params',
         'whill_joy2_params.yaml'
     )
+    whill_model_urdf_file = xacro.process_file(whill_model_xacro_path)
+    robot_description = whill_model_urdf_file.toprettyxml(indent='\t')
+    with open(whill_model_urdf_path, "w") as urdf_file:
+        urdf_file.write(robot_description)    
+        
+        
+##############################################################################################        
+########################################## ROS API ###########################################
+##############################################################################################         
+        
     
+    # Argument
     whill_joy_state_arg = DeclareLaunchArgument(name="whill_joy_state", default_value="whill/states/joy")
     whill_joy_control_arg = DeclareLaunchArgument(name='whill_joy_control', default_value="whill/controller/joy")
     ros2_whill_cmd_vel_arg = DeclareLaunchArgument(name='ros2_whill_cmd_vel', default_value='whill/controller/cmd_vel')
     whill_joy2_cmd_vel_arg = DeclareLaunchArgument(name='whill_joy2_cmd_vel', default_value='whill_joy2/cmd_vel')
-    
-    whill_model_urdf_file = xacro.process_file(whill_model_xacro_path)
-    robot_description = whill_model_urdf_file.toprettyxml(indent='\t')
-    with open(whill_model_urdf_path, "w") as urdf_file:
-        urdf_file.write(robot_description)
     
     # Node
     robot_state_publisher_node = Node(
