@@ -56,7 +56,7 @@ class MakeDir(Node):
         )
         self._suffix_paths_dict_ = {
             map_path: ["", "re"], 
-            bag_path: ["backup_", "production_"], 
+            bag_path: ["", "backup_", "production_"], 
             waypoint_path: ["", "re", "final"], 
             branchpoint_path: [""]
         }

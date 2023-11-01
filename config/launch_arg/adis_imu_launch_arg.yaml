@@ -9,3 +9,4 @@ adis_imu_launch:
   rate: '100.0'
   publish_tf: 'true'
   publish_debug_topics: 'false'
+  use_mag: 'false'

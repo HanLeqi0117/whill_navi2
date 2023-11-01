@@ -184,10 +184,32 @@ def generate_launch_description():
             )
         ]
     )
+
+    # Launch Group
+    launch_group = GroupAction(actions=[
+        sensor_launch,
+        kuaro_whill_launch
+    ])
+    # Node Group
+    node_group = GroupAction(actions=[
+        make_dir_node,
+        tf2_static_hokuyo_node,
+        tf2_static_velodyne_node,
+        tf2_static_imu_node,
+        tf2_static_gnss_node,
+        ekf_odometry_node,
+        rviz2_node
+    ])
+    # Action Group
+    action_group = GroupAction(actions=[
+        node_group,
+        launch_group
+    ])
+
     # Event
     ros2bag_record_event = RegisterEventHandler(
         OnProcessStart(
-            target_action=action_group,
+            target_action=make_dir_node,
             on_start=[
                 LogInfo(msg='Sensors are launched, and then start to record the data.'),
                 TimerAction(
@@ -206,32 +228,13 @@ def generate_launch_description():
         )
     )
     
-    # Launch Group
-    launch_group = GroupAction(actions=[
-        sensor_launch,
-        kuaro_whill_launch
-    ])
-    # Node Group
-    node_group = GroupAction(actions=[
-        make_dir_node,
-        tf2_static_hokuyo_node,
-        tf2_static_velodyne_node,
-        tf2_static_imu_node,
-        tf2_static_gnss_node,
-        ekf_odometry_node,
-        rviz2_node
-    ])    
-    # Action Group
-    action_group = GroupAction(actions=[
-        node_group,
-        launch_group
-    ])
     # Event Group
     event_group = GroupAction(actions=[
         ros2bag_record_event,
         shutdown_event
     ])
 
-    return LaunchDescription([    
-        event_group     
+    return LaunchDescription([   
+        action_group, 
+        event_group
     ])
