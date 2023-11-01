@@ -79,6 +79,9 @@ def generate_launch_description():
              "publish_temperature": LaunchConfiguration("publish_temperature"),
              "rate": LaunchConfiguration("rate")
         }],
+        remappings=[
+            ("imu/data_raw", "imu/data_raw")
+        ],
         output="screen"                                                 # ターミナルにLogを出力する
     )
     # IMUのデータフィルタを起動する
@@ -91,6 +94,11 @@ def generate_launch_description():
             "publish_tf": LaunchConfiguration("publish_tf"),
             "publish_debug_topics": LaunchConfiguration("publish_debug_topics")
         }],
+        remappings=[
+            ("imu/data_raw", "imu/data_raw"),
+            ("imu/data", "imu/data"),
+            ("imu/mag", "imu/mag")
+        ],
         condition=IfCondition(LaunchConfiguration("with_filter"))       # ノードの実行条件
     )
     # Rvizを起動する

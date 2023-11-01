@@ -174,7 +174,7 @@ def generate_launch_description():
     )
     ros2bag_backup_process = ExecuteProcess(
         cmd=[
-            "cp", "-r", 
+            "cp", "-rv", 
             os.path.join(bag_path, nodeparams_make_dir['bag_name']),
             os.path.join(
                 bag_path, '..', 

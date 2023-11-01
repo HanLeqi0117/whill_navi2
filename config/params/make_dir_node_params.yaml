@@ -1,8 +1,8 @@
 make_dir_node:
   ros__parameters:
     ws_path: whill2_ws
-    place_path: nakanoshima
-    date_path: "2023_10_13_2"
+    place_path: rinpukan
+    date_path: "2023_11_01"
     bag_path: bag
     map_path: map
     waypoint_path: waypoint
