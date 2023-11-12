@@ -21,9 +21,9 @@ def generate_launch_description():
     f9p_yaml_params_path = os.path.join(params_path, "zed_f9p_node_params.yaml")
     ntrip_yaml_params_path = os.path.join(params_path, "ntrip_client_node_params.yaml")
     
-##############################################################################################        
-########################################## ROS API ###########################################
-############################################################################################## 
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
     
     # Declare launch arguments
     general_debug_arg = DeclareLaunchArgument(name="debug", default_value='true')
@@ -71,16 +71,7 @@ def generate_launch_description():
             ("nmea_sentence", "nmea")
         ]
     )
-    
-    # Argument Group
-    arg_group = GroupAction(actions=[
-        general_debug_arg,
-        f9p_use_rtk_arg,
-        f9p_port_arg,
-        ntrip_check_gga_arg,
-        ntrip_mountpoint_arg,
-        frame_id_arg,
-    ])    
+     
     # Node Group
     node_group = GroupAction(actions=[
         f9p_node,
@@ -89,6 +80,11 @@ def generate_launch_description():
     ])
         
     return LaunchDescription([
-        arg_group,
+        general_debug_arg,
+        f9p_use_rtk_arg,
+        f9p_port_arg,
+        ntrip_check_gga_arg,
+        ntrip_mountpoint_arg,
+        frame_id_arg,
         node_group,
     ])

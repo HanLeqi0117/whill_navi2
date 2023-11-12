@@ -11,7 +11,6 @@ from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
 
-
 def generate_launch_description():
 
     launcharg_path = os.path.join(
@@ -36,9 +35,9 @@ def generate_launch_description():
         launcharg_hokuyo_lrf = yaml.safe_load(f)['hokuyo_lrf_launch']
         
         
-##############################################################################################        
-########################################## ROS API ###########################################
-##############################################################################################         
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
         
     # Declare Launch Arguments
     use_adis_imu_arg = DeclareLaunchArgument("use_adis_imu", default_value="true")
@@ -106,15 +105,6 @@ def generate_launch_description():
     )
     
     # Group
-    arg_group = GroupAction(actions=[
-        use_adis_imu_arg,
-        use_velodyne_arg,
-        use_ublox_arg,
-        use_hokuyo_arg,
-        use_web_camera_arg,
-        use_realsense_camera_arg,
-        use_zed_camera_arg,
-    ])
     launch_group = GroupAction(actions=[
         velodyne_launch,
         web_camera_launch,
@@ -123,9 +113,14 @@ def generate_launch_description():
         adis_imu_launch
     ])
     
-    
     return LaunchDescription([
-        arg_group,
+        use_adis_imu_arg,
+        use_velodyne_arg,
+        use_ublox_arg,
+        use_hokuyo_arg,
+        use_web_camera_arg,
+        use_realsense_camera_arg,
+        use_zed_camera_arg,
         launch_group
     ])
     

@@ -27,9 +27,9 @@ def generate_launch_description():
             robot_description = imu_urdf_file.read()
             
             
-##############################################################################################        
-########################################## ROS API ###########################################
-############################################################################################## 
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
 
     # Launchの引数オブジェクトを宣言する
     # IMUのデータをフィルタで処理するかどうか。Trueの場合、処理する。Falseの場合、処理しない。
@@ -129,20 +129,6 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration("with_plot"))         # ノードの実行条件
     )  
           
-    # Argument Group
-    arg_group = GroupAction(actions=[
-        with_filter_arg,
-        with_rviz_arg,
-        with_plot_arg,
-        imu_device_arg,
-        frame_id_arg,
-        burst_read_arg,
-        publish_temperature_arg,
-        rate_arg,
-        publish_tf_arg,
-        publish_debug_topics_arg,
-        use_mag_arg
-    ])
     # Node Group
     node_group = GroupAction(actions=[
         accl_plot_node,
@@ -154,6 +140,16 @@ def generate_launch_description():
     ])
 
     return LaunchDescription([    
-        arg_group,
+        with_filter_arg,
+        with_rviz_arg,
+        with_plot_arg,
+        imu_device_arg,
+        frame_id_arg,
+        burst_read_arg,
+        publish_temperature_arg,
+        rate_arg,
+        publish_tf_arg,
+        publish_debug_topics_arg,
+        use_mag_arg,
         node_group  
     ])

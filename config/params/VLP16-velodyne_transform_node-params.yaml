@@ -2,9 +2,9 @@ velodyne_transform_node:
     ros__parameters:
         calibration: VLP16db.yaml
         model: VLP16
-        min_range: 0.9
-        max_range: 130.0
+        min_range: 0.5  # 0.9
+        max_range: 100.0  # 130.0
         view_direction: 0.0
-        fixed_frame: ""
-        target_frame: ""
-        organize_cloud: true
+        fixed_frame: "velodyne"  # ""
+        target_frame: "velodyne"  # ""
+        organize_cloud: false  # true

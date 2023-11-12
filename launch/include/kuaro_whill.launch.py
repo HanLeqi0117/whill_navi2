@@ -41,15 +41,14 @@ def generate_launch_description():
         urdf_file.write(robot_description)    
         
         
-##############################################################################################        
-########################################## ROS API ###########################################
-##############################################################################################         
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
         
     
     # Argument
     whill_joy_state_arg = DeclareLaunchArgument(name="whill_joy_state", default_value="whill/states/joy")
     whill_joy_control_arg = DeclareLaunchArgument(name='whill_joy_control', default_value="whill/controller/joy")
-    ros2_whill_cmd_vel_arg = DeclareLaunchArgument(name='ros2_whill_cmd_vel', default_value='whill/controller/cmd_vel')
     whill_joy2_cmd_vel_arg = DeclareLaunchArgument(name='whill_joy2_cmd_vel', default_value='whill_joy2/cmd_vel')
     
     # Node
@@ -68,10 +67,7 @@ def generate_launch_description():
         name='ros2_whill',
         output='screen',
         namespace='whill',
-        parameters=[ros2_whill_yaml_path],
-        remappings=[
-            ('controller/cmd_vel', LaunchConfiguration(ros2_whill_cmd_vel_arg.name))
-        ]
+        parameters=[ros2_whill_yaml_path]
     )
     joy_node = Node(
         package='joy',
@@ -93,22 +89,16 @@ def generate_launch_description():
         ]
     )
     
-    # Group
-    arg_group = GroupAction(actions=[
-        whill_joy_state_arg,
-        whill_joy_control_arg,
-        ros2_whill_cmd_vel_arg,
-        whill_joy2_cmd_vel_arg,
-    ])
     node_group = GroupAction(actions=[
         robot_state_publisher_node,
         ros2_whill_node,
         joy_node,
         whill_joy2_node
-    ])
-        
+    ])   
             
     return LaunchDescription([
-        arg_group,
+        whill_joy_state_arg,
+        whill_joy_control_arg,
+        whill_joy2_cmd_vel_arg,
         node_group
     ])

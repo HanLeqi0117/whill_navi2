@@ -53,16 +53,28 @@ def generate_launch_description():
         nodeparams_make_dir['bag_path']
     )
     
-    # if bag_file in bag_path, remove existed bag_file
+    # if bag_file in bag_path, it will take a backup
     if os.path.exists(bag_path):
         bag_files_list = list_files_in_directory(bag_path)
-        if bag_files_list.count() > 0:
+        if len(bag_files_list) > 0:
             for bag_file in bag_files_list:
-                shutil.rmtree(bag_file)
+                backup_bag_path = os.path.join(bag_path, '..', 'backup_bag')
+                backup_bag_file = bag_file + '_{:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
+                if os.path.exists(backup_bag_path):
+                    shutil.move(
+                        os.path.join(bag_path, bag_file),
+                        os.path.join(backup_bag_path, backup_bag_file)
+                    )
+                else:
+                    os.makedirs(backup_bag_path)
+                    shutil.move(
+                        os.path.join(bag_path, bag_file),
+                        os.path.join(backup_bag_path, backup_bag_file)
+                    )
     
-##############################################################################################        
-########################################## ROS API ###########################################
-##############################################################################################        
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
     
     # Include Launch File
     # sensor Launch
@@ -119,9 +131,15 @@ def generate_launch_description():
         name='imu_to_base_link',
         arguments = [
             '--x', '0.44', '--y', '0.23', '--z', '0.2575', 
-            '--roll', '-1.57079', '--pitch', '0.0', '--yaw', '0.0', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
             '--frame-id', 'base_link', '--child-frame-id', 'imu'
-        ] 
+        ]
+        # IMU TF Arguments
+        # arguments = [
+        #     '--x', '0.44', '--y', '0.23', '--z', '0.2575', 
+        #     '--roll', '-1.57079', '--pitch', '0.0', '--yaw', '0.0', 
+        #     '--frame-id', 'base_link', '--child-frame-id', 'imu'
+        # ]        
     )
     tf2_static_gnss_node = Node(
         package='tf2_ros',
@@ -168,13 +186,14 @@ def generate_launch_description():
                 "full_data",
                 str(nodeparams_make_dir['date_path']),
                 nodeparams_make_dir['place_path'],
-                nodeparams_make_dir["bag_path"]
+                nodeparams_make_dir["bag_path"],
+                nodeparams_make_dir["bag_name"]
             )
         ]
     )
     ros2bag_backup_process = ExecuteProcess(
         cmd=[
-            "cp", "-rv", 
+            "cp", "-r", 
             os.path.join(bag_path, nodeparams_make_dir['bag_name']),
             os.path.join(
                 bag_path, '..', 
@@ -219,19 +238,10 @@ def generate_launch_description():
             ]
         )
     )
-    shutdown_event = RegisterEventHandler(
-        OnShutdown(
-            on_shutdown=[
-                LogInfo(msg='Copy bag_file to $(bag_path)/back_up for Backup.'),
-                ros2bag_backup_process
-            ]
-        )
-    )
     
     # Event Group
     event_group = GroupAction(actions=[
         ros2bag_record_event,
-        shutdown_event
     ])
 
     return LaunchDescription([   

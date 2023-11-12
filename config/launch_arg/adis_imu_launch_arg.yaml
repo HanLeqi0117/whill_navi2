@@ -7,6 +7,6 @@ adis_imu_launch:
   burst_read: 'false'
   publish_temperature: 'false'
   rate: '100.0'
-  publish_tf: 'true'
+  publish_tf: 'false'
   publish_debug_topics: 'false'
   use_mag: 'false'
