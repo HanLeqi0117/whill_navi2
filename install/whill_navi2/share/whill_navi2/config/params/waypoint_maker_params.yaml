@@ -1,0 +1,5 @@
+waypoint_maker:
+  ros__parameters:
+    point_distance: '4.0'
+    deg_thresh: '15.0'
+    deg_chord: '1.0'

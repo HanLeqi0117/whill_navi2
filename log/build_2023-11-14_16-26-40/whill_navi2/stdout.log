@@ -1,0 +1,86 @@
+running egg_info
+creating build/whill_navi2/whill_navi2.egg-info
+writing build/whill_navi2/whill_navi2.egg-info/PKG-INFO
+writing dependency_links to build/whill_navi2/whill_navi2.egg-info/dependency_links.txt
+writing entry points to build/whill_navi2/whill_navi2.egg-info/entry_points.txt
+writing requirements to build/whill_navi2/whill_navi2.egg-info/requires.txt
+writing top-level names to build/whill_navi2/whill_navi2.egg-info/top_level.txt
+writing manifest file 'build/whill_navi2/whill_navi2.egg-info/SOURCES.txt'
+reading manifest file 'build/whill_navi2/whill_navi2.egg-info/SOURCES.txt'
+writing manifest file 'build/whill_navi2/whill_navi2.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build
+creating /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build/lib
+creating /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build/lib/whill_navi2
+copying whill_navi2/make_dir_node.py -> /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build/lib/whill_navi2
+copying whill_navi2/__init__.py -> /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build/lib/whill_navi2
+running install
+running install_lib
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/python3.10/site-packages/whill_navi2
+copying /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build/lib/whill_navi2/make_dir_node.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/python3.10/site-packages/whill_navi2
+copying /home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/build/lib/whill_navi2/__init__.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/python3.10/site-packages/whill_navi2
+byte-compiling /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/python3.10/site-packages/whill_navi2/make_dir_node.py to make_dir_node.cpython-310.pyc
+byte-compiling /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/python3.10/site-packages/whill_navi2/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/ament_index
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/ament_index/resource_index
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/ament_index/resource_index/packages
+copying resource/whill_navi2 -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/ament_index/resource_index/packages
+copying package.xml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+copying launch/waypoint_editor.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+copying launch/test.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+copying launch/slam_offline.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+copying launch/data_gather.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+copying launch/waypoint_generator.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+copying launch/navigation.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/urg_node2.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/adis16465.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/web_camera.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/zed_f9p.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/map_saver_server.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/velodyne-all-nodes-VLP16-composed-launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/sensor.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/kuaro_whill.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/velodyne-all-nodes-VLP16-launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+copying launch/include/ros2_whill.launch.py -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/launch/include
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/slam_offline_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/ekf_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/hokuyo_urg_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/waypoint_maker_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/default-velodyne_laserscan_node-params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/zed_f9p_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/ros2_whill_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/make_dir_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/whill_joy2_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/VLP16-velodyne_transform_node-params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/web_camera_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/VLP16db.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/dual_ekf_navsat_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/amcl_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/VLP16-velodyne_driver_node-params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+copying config/params/ntrip_client_node_params.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/params
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/rviz2
+copying config/rviz2/velodyne.rviz -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/rviz2
+copying config/rviz2/hokuyo_urg.rviz -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/rviz2
+copying config/rviz2/adis_imu.rviz -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/rviz2
+copying config/rviz2/data_gather_launch.rviz -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/rviz2
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/launch_arg
+copying config/launch_arg/ublox_gnss_launch_arg.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/launch_arg
+copying config/launch_arg/adis_imu_launch_arg.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/launch_arg
+copying config/launch_arg/sensor_launch_arg.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/launch_arg
+copying config/launch_arg/hokuyo_lrf_launch_arg.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/launch_arg
+copying config/launch_arg/kuaro_whill_launch_arg.yaml -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/launch_arg
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/urdf
+copying config/urdf/adis16470_breakout.urdf -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/urdf
+creating /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/xacro
+copying config/xacro/modelc.urdf.xacro -> /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/share/whill_navi2/config/xacro
+running install_egg_info
+Copying build/whill_navi2/whill_navi2.egg-info to /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/python3.10/site-packages/whill_navi2-0.0.0-py3.10.egg-info
+running install_scripts
+Installing make_dir_node script to /home/robo/whill2_ws/src/whill_navi2/install/whill_navi2/lib/whill_navi2
+writing list of installed files to '/home/robo/whill2_ws/src/whill_navi2/build/whill_navi2/install.log'

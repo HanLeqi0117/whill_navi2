@@ -1,0 +1,12 @@
+adis_imu_launch:
+  device: /dev/ttyACM0
+  with_filter: 'true'
+  with_rviz: 'false'
+  with_plot: 'false'
+  frame_id: imu
+  burst_read: 'false'
+  publish_temperature: 'false'
+  rate: '100.0'
+  publish_tf: 'false'
+  publish_debug_topics: 'false'
+  use_mag: 'false'

@@ -1,5 +1,3 @@
-#! /bin/env python
-
 import os
 import yaml
 import xacro
@@ -63,6 +61,14 @@ def generate_launch_description():
         remappings=[('/joint_states', '/whill/states/jointState')],     # トピックのremap
         output='screen'                                                 # ログをコンソール画面に出力する
     )
+    ros2_whill_node = Node(
+        package='ros2_whill',
+        executable='ros2_whill',
+        name='ros2_whill',
+        output='screen',
+        namespace='whill',
+        parameters=[ros2_whill_yaml_path]
+    )
     joy_node = Node(
         package='joy',
         executable='joy_node',
@@ -85,6 +91,7 @@ def generate_launch_description():
     
     node_group = GroupAction(actions=[
         robot_state_publisher_node,
+        ros2_whill_node,
         joy_node,
         whill_joy2_node
     ])   
@@ -95,7 +102,3 @@ def generate_launch_description():
         whill_joy2_cmd_vel_arg,
         node_group
     ])
-
-
-if __name__ == "__main__":
-    generate_launch_description()
