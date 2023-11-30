@@ -1,0 +1,24 @@
+# ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="0425", ATTRS{idProduct}=="2514", OWNER="robo", MODE="0777"
+# ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="15d1", ATTRS{idProduct}=="0000", OWNER="robo", MODE="0777"
+
+# WHILL SERIAL
+
+# KUARO
+KERNEL=="ttyUSB*", ATTRS{product}=="USB HS SERIAL CONVERTER", ATTRS{serial}=="FTY1GCEQ", MODE="0666", SYMLINK+="kuaro/ttyUSBOkatech"
+
+# Gyro
+# KERNEL=="ttyACM*",ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740",MODE="0666",SYMLINK+="kuaro/ttyUSBGyro"
+# KERNEL=="ttyACM*",ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9",MODE="0666",SYMLINK+="kuaro/ttyUSBGPS"
+
+# UBLOX
+# KERNEL=="ttyACM*", ATTRS{product}=="USB HS SERIAL CONVERTER", ATTRS{serial}=="FTXQOCXI",MODE="0666", SYMLINK+="kuaro/ttyUSBUblox"
+
+# ADIS16465/ADIS16470 IMU
+KERNEL=="ttyACM*",ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="ffee",MODE="0666",SYMLINK+="kuaro/ttyUSBIMU"
+
+# HOKUYO LRF
+# KERNEL=="ttyACM1",ATTRS{idVendor}=="15d1", MODE="0666", PROGRAM="/opt/ros/melodic/lib/urg_node/getID /dev/%k q", SYMLINK+="kuaro/lrf_%c"
+
+# WHILL
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", MODE="0666", SYMLINK+="kuaro/ttyUSBWhill"
+
