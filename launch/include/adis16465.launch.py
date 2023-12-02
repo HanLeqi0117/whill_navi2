@@ -32,27 +32,19 @@ def generate_launch_description():
 ##############################################################################################
 
     # Launchの引数オブジェクトを宣言する
-    # IMUのデータをフィルタで処理するかどうか。Trueの場合、処理する。Falseの場合、処理しない。
     with_filter_arg = DeclareLaunchArgument(name="with_filter", default_value="true")
-    # Rviz(可視化ツール)を起動するかどうか。Trueの場合、起動する。Falseの場合、起動しない。
     with_rviz_arg = DeclareLaunchArgument(name="with_rviz", default_value="true")
-    # Plot(図表作成ツール)を起動するかどうか。Trueの場合、起動する。Falseの場合、起動しない。
     with_plot_arg = DeclareLaunchArgument(name="with_plot", default_value="false")
-    # デバイスファイルのアドレス
     imu_device_arg = DeclareLaunchArgument(name="device", default_value="/dev/ttyACM0")
-    # 座標ID
     frame_id_arg = DeclareLaunchArgument(name="frame_id", default_value="imu")
-    # Burst通信方式を使用するかどうか。Trueの場合、使用する。Falseの場合、使用しない(普通の通信方式を使用する)。
     burst_read_arg = DeclareLaunchArgument(name="burst_read", default_value="false")
-    # IMUの温度情報を送信するかどうか。Trueの場合、送信する。Falseの場合、送信しない。
     publish_temperature_arg = DeclareLaunchArgument(name="publish_temperature", default_value="false")
-    # 通信周期、単位：Hz
     rate_arg = DeclareLaunchArgument(name="rate", default_value="100.0")
-    # TFを送信するかどうか。Trueの場合、送信する。Falseの場合、送信しない。
     publish_tf_arg = DeclareLaunchArgument(name="publish_tf", default_value="true")
-    # デバッグを行うかどうか。Trueの場合、デバッグする。Falseの場合、デバッグしない。
     publish_debug_topics_arg = DeclareLaunchArgument(name="publish_debug_topics", default_value="false")
     use_mag_arg = DeclareLaunchArgument(name="use_mag", default_value="false")
+    raw_data_topic_arg = DeclareLaunchArgument(name="raw_data_topic", default_value="imu/data_raw")
+    filtered_data_topic_arg = DeclareLaunchArgument(name="filtered_data_topic", default_value="imu/data")
 
     # Nodeのオブジェクトを宣言する
     # 起動するノードのオブジェクトの宣言
@@ -80,7 +72,7 @@ def generate_launch_description():
              "rate": LaunchConfiguration("rate")
         }],
         remappings=[
-            ("imu/data_raw", "imu/data_raw")
+            ("imu/data_raw", LaunchConfiguration(raw_data_topic_arg.name))
         ],
         output="screen"                                                 # ターミナルにLogを出力する
     )
@@ -95,8 +87,8 @@ def generate_launch_description():
             "publish_debug_topics": LaunchConfiguration("publish_debug_topics")
         }],
         remappings=[
-            ("imu/data_raw", "imu/data_raw"),
-            ("imu/data", "imu/data"),
+            ("imu/data_raw", LaunchConfiguration(raw_data_topic_arg.name)),
+            ("imu/data", LaunchConfiguration(filtered_data_topic_arg.name)),
             ("imu/mag", "imu/mag")
         ],
         condition=IfCondition(LaunchConfiguration("with_filter"))       # ノードの実行条件
@@ -141,6 +133,8 @@ def generate_launch_description():
 
     return LaunchDescription([    
         with_filter_arg,
+        raw_data_topic_arg,
+        filtered_data_topic_arg,
         with_rviz_arg,
         with_plot_arg,
         imu_device_arg,

@@ -1,4 +1,0 @@
-zed_f9p_node:
-  ros__parameters:
-    baud: 230400
-    rate: 20.0

@@ -1,4 +1,0 @@
-kuaro_whill_launch:
-    whill_joy_state: 'whill/states/joy'
-    whill_joy_control: 'whill/controller/joy'
-    whill_joy2_cmd_vel: 'whill_joy2/cmd_vel'

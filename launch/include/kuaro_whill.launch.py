@@ -44,12 +44,6 @@ def generate_launch_description():
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
-        
-    
-    # Argument
-    whill_joy_state_arg = DeclareLaunchArgument(name="whill_joy_state", default_value="whill/states/joy")
-    whill_joy_control_arg = DeclareLaunchArgument(name='whill_joy_control', default_value="whill/controller/joy")
-    whill_joy2_cmd_vel_arg = DeclareLaunchArgument(name='whill_joy2_cmd_vel', default_value='whill_joy2/cmd_vel')
     
     # Node
     robot_state_publisher_node = Node(
@@ -61,6 +55,7 @@ def generate_launch_description():
         remappings=[('/joint_states', '/whill/states/jointState')],     # トピックのremap
         output='screen'                                                 # ログをコンソール画面に出力する
     )
+    # Parameter YAML file: config/param/ros2_whill_params.yaml
     ros2_whill_node = Node(
         package='ros2_whill',
         executable='ros2_whill',
@@ -73,9 +68,10 @@ def generate_launch_description():
         package='joy',
         executable='joy_node',
         name='joy_node',
-        remappings=[('joy', LaunchConfiguration(whill_joy_control_arg.name))],
+        remappings=[('joy', 'whill/controller/joy')],
         output='screen'
     )
+    # Parameter YAML file: config/param/whill_joy2_params.yaml
     whill_joy2_node = Node(
         package='ros2_whill',
         executable='whill_joy2',
@@ -83,9 +79,9 @@ def generate_launch_description():
         output='screen',
         parameters=[whill_joy2_params_path],
         remappings=[
-            ('joy_state', LaunchConfiguration(whill_joy_state_arg.name)),
-            ('controller/joy', LaunchConfiguration(whill_joy_control_arg.name)),
-            ('controller/cmd_vel', LaunchConfiguration(whill_joy2_cmd_vel_arg.name))
+            ('joy_state', 'joy_state'),
+            ('controller/joy', 'controller/joy'),
+            ('controller/cmd_vel', 'controller/cmd_vel')
         ]
     )
     
@@ -97,8 +93,5 @@ def generate_launch_description():
     ])   
             
     return LaunchDescription([
-        whill_joy_state_arg,
-        whill_joy_control_arg,
-        whill_joy2_cmd_vel_arg,
         node_group
     ])

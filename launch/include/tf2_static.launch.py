@@ -1,4 +1,3 @@
-#! /bin/env python
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -94,7 +93,3 @@ def generate_launch_description():
         tf2_static_wit_imu_node,
         tf2_static_gnss_node
     ])
-
-
-if __name__ == "__main__":
-    generate_launch_description()

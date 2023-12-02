@@ -1,3 +1,13 @@
+# 説明
+# KERNEL: KERNELデバイスの名前を指定する。e.g. 'ttyACM0', 'ttyACM*', 'ttyACM[0-9]'
+# ATTRS: デバイスの属性。e.g. idVendor: USBデバイスの製造元（ベンダーID）.idProduct: USBデバイスの製品ID. serial: デバイスのシリアル番号. modalias: デバイスのカーネルモジュールエイリアス
+# SYMLINK: KERNELデバイスにシンボリックリンクを指定する。
+# MODE: KERNELデバイスのアクセス権限を設定する。'777'の意味は、'rwxrwxrwx'。'r'は、'read'の略称。'w'は、'write'の略称。'x'は、'excute'の略称。
+# 'rwx'は2進数で表すと、'111'になり、10進数で表すと'7'となる。最初のポジションは、'OWNER'の権限を示すを示す。2つ目のポジションは、'GROUP'。3つ目のポジションは、'OTHER'。
+# '777'を翻訳すると、'OWNER', 'GROUP', 'OTHER'のいずれも、書き読みまた実行を行う権限を所有するように設定する。
+# 符号の意味： '=='は条件をつけること。'='は値を与えること。'+='は追加すること。
+
+# 設定
 # ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="0425", ATTRS{idProduct}=="2514", OWNER="robo", MODE="0777"
 # ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="15d1", ATTRS{idProduct}=="0000", OWNER="robo", MODE="0777"
 
@@ -7,17 +17,20 @@
 KERNEL=="ttyUSB*", ATTRS{product}=="USB HS SERIAL CONVERTER", ATTRS{serial}=="FTY1GCEQ", MODE="0666", SYMLINK+="kuaro/ttyUSBOkatech"
 
 # Gyro
-# KERNEL=="ttyACM*",ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740",MODE="0666",SYMLINK+="kuaro/ttyUSBGyro"
-# KERNEL=="ttyACM*",ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9",MODE="0666",SYMLINK+="kuaro/ttyUSBGPS"
+# KERNEL=="ttyACM*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", MODE="0666", SYMLINK+="kuaro/ttyUSBGyro"
+# KERNEL=="ttyACM*", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", MODE="0666", SYMLINK+="kuaro/ttyUSBGPS"
 
 # UBLOX
-# KERNEL=="ttyACM*", ATTRS{product}=="USB HS SERIAL CONVERTER", ATTRS{serial}=="FTXQOCXI",MODE="0666", SYMLINK+="kuaro/ttyUSBUblox"
+# KERNEL=="ttyACM*", ATTRS{product}=="USB HS SERIAL CONVERTER", ATTRS{serial}=="FTXQOCXI", MODE="0666", SYMLINK+="kuaro/ttyUSBUblox"
 
 # ADIS16465/ADIS16470 IMU
-KERNEL=="ttyACM*",ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="ffee",MODE="0666",SYMLINK+="kuaro/ttyUSBIMU"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="ffee", MODE="0666", SYMLINK+="kuaro/ttyUSBADISIMU"
+
+# WITMOTION WT901CL IMU
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666", SYMLINK+="kuaro/ttyUSBWITIMU"
 
 # HOKUYO LRF
-# KERNEL=="ttyACM1",ATTRS{idVendor}=="15d1", MODE="0666", PROGRAM="/opt/ros/melodic/lib/urg_node/getID /dev/%k q", SYMLINK+="kuaro/lrf_%c"
+# KERNEL=="ttyACM*", ATTRS{idVendor}=="15d1", MODE="0666", PROGRAM="/opt/ros/melodic/lib/urg_node/getID /dev/%k q", SYMLINK+="kuaro/lrf_%c"
 
 # WHILL
 KERNEL=="ttyUSB*", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", MODE="0666", SYMLINK+="kuaro/ttyUSBWhill"

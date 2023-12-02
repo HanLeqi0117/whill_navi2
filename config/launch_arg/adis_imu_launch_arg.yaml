@@ -1,12 +1,14 @@
 adis_imu_launch:
-  device: /dev/ttyACM0
-  with_filter: 'true'
-  with_rviz: 'false'
-  with_plot: 'false'
-  frame_id: imu
-  burst_read: 'false'
-  publish_temperature: 'false'
-  rate: '100.0'
-  publish_tf: 'false'
-  publish_debug_topics: 'false'
+  device: /dev/ttyACM0  # デバイスのパス
+  with_filter: 'true'  # IMUのデータをフィルタで処理するかどうか。Trueの場合、処理する。Falseの場合、処理しない。
+  with_rviz: 'false'  # Rviz(可視化ツール)を起動するかどうか。Trueの場合、起動する。Falseの場合、起動しない。
+  with_plot: 'false'  # Plot(図表作成ツール)を起動するかどうか。Trueの場合、起動する。Falseの場合、起動しない。
+  frame_id: imu_adis  # フレームID
+  burst_read: 'false'  # Burst通信方式を使用するかどうか。Trueの場合、使用する。Falseの場合、使用しない(普通の通信方式を使用する)。
+  publish_temperature: 'false'  # IMUの温度情報を送信するかどうか。Trueの場合、送信する。Falseの場合、送信しない。
+  rate: '100.0'  # 通信周期、単位：Hz
+  publish_tf: 'false'  # TFを送信するかどうか。Trueの場合、送信する。Falseの場合、送信しない。
+  publish_debug_topics: 'false'  # デバッグを行うかどうか。Trueの場合、デバッグする。Falseの場合、デバッグしない。
+  raw_data_topic: 'adis/imu/data_raw'  # ADIS16465の生情報のトピック名
+  filtered_data_topic: 'adis/imu/data'  # カルマンフィルタを通したADIS16465の情報のトピック名
   use_mag: 'false'

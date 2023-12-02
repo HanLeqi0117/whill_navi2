@@ -1,6 +1,0 @@
-ntrip_client_node:
-  ros__parameters:
-    username: "8wna5x52"
-    password: "bh2ket"
-    host_url: "ntrip.ales-corp.co.jp"
-    port: 2101

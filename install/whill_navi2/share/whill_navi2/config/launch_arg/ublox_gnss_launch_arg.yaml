@@ -1,7 +1,0 @@
-ublox_gnss_launch:
-  use_rtk: 'false'
-  port: '/dev/ttyACM1'
-  debug: 'false'
-  check_gga: 'true'
-  mountpoint: '32M4NHS'
-  frame_id: 'gnss'

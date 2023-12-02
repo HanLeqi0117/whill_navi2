@@ -22,20 +22,20 @@ def list_files_in_directory(path):
     return sorted(dir_list)
 
 def generate_launch_description():
-       
+
     launcharg_path = os.path.join(
         get_package_share_directory('whill_navi2'),
         'config', 'launch_arg', 'sensor_launch_arg.yaml'
     )
     with open(launcharg_path) as f:
         launcharg_sensor = yaml.safe_load(f)['sensor_launch']
-    
+            
     launcharg_path = os.path.join(
         get_package_share_directory('whill_navi2'),
-        'config', 'launch_arg', 'kuaro_whill_launch_arg.yaml'
+        'config', 'launch_arg', 'tf2_static_launch.yaml'
     )
     with open(launcharg_path) as f:
-        launcharg_kuaro_whill = yaml.safe_load(f)['kuaro_whill_launch']
+        launcharg_tf2_static = yaml.safe_load(f)['tf2_static_launch']    
     
     paramspath_make_dir = os.path.join(
         get_package_share_directory('whill_navi2'),
@@ -78,6 +78,7 @@ def generate_launch_description():
     
     # Include Launch File
     # sensor Launch
+    # Argument YAML file: config/launch_arg/sensor_launch_arg.yaml
     sensor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -88,69 +89,37 @@ def generate_launch_description():
         launch_arguments=launcharg_sensor.items()
     )
     # kuaro_whill Launch
+    # Parameter YAML file: config/param/ros2_whill_params.yaml
+    # Parameter YAML file: config/param/whill_joy2_params.yaml
     kuaro_whill_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('whill_navi2'),
                 'launch', 'include', 'kuaro_whill.launch.py'
             )
+        )
+    )
+    # tf2_static Launch
+    # Argument YAML file: config/launch_arg/tf2_static_launch_arg.yaml
+    tf2_static_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('whill_navi2'),
+                'launch', 'include', 'tf2_static.launch.py'
+            )
         ),
-        launch_arguments=launcharg_kuaro_whill.items()
+        launch_arguments=launcharg_tf2_static.items()
     )
     
     # Node
+    # Parameter YAML file: config/param/make_dir_node_params.yaml
     make_dir_node = Node(
         package='whill_navi2',
         executable='make_dir_node',
         name='make_dir_node',
         parameters=[paramspath_make_dir]
     )
-    tf2_static_hokuyo_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='laser_front_to_base_link',
-        arguments = [
-            '--x', '0.50', '--y', '0.0', '--z', '0.33', 
-            '--roll', '0.0', '--pitch', '0.0', '--yaw', '3.14159', 
-            '--frame-id', 'base_link', '--child-frame-id', 'laser_front'
-        ]  
-    )
-    tf2_static_velodyne_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='velodyne_to_base_link',
-        arguments = [
-            '--x', '0.0', '--y', '0.0', '--z', '0.8875', 
-            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
-            '--frame-id', 'base_link', '--child-frame-id', 'velodyne'
-        ]  
-    )
-    tf2_static_imu_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='imu_to_base_link',
-        arguments = [
-            '--x', '0.44', '--y', '0.23', '--z', '0.2575', 
-            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
-            '--frame-id', 'base_link', '--child-frame-id', 'imu'
-        ]
-        # IMU TF Arguments
-        # arguments = [
-        #     '--x', '0.44', '--y', '0.23', '--z', '0.2575', 
-        #     '--roll', '-1.57079', '--pitch', '0.0', '--yaw', '0.0', 
-        #     '--frame-id', 'base_link', '--child-frame-id', 'imu'
-        # ]        
-    )
-    tf2_static_gnss_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='gnss_to_base_link',
-        arguments = [
-            '--x', '0.71', '--y', '0.0', '--z', '0.0175', 
-            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
-            '--frame-id', 'base_link', '--child-frame-id', 'gnss'
-        ]
-    )
+    # Parameter YAML file: config/param/ekf_node_params.yaml
     ekf_odometry_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -162,6 +131,7 @@ def generate_launch_description():
             )
         ]
     )
+    # Rviz config file: config/rviz2/data_gather_launch.rviz
     rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -204,22 +174,20 @@ def generate_launch_description():
         ]
     )
 
-    # Launch Group
+    ## Group
+    # Launch
     launch_group = GroupAction(actions=[
         sensor_launch,
-        kuaro_whill_launch
+        kuaro_whill_launch,
+        tf2_static_launch
     ])
-    # Node Group
+    # Node
     node_group = GroupAction(actions=[
         make_dir_node,
-        tf2_static_hokuyo_node,
-        tf2_static_velodyne_node,
-        tf2_static_imu_node,
-        tf2_static_gnss_node,
         ekf_odometry_node,
         rviz2_node
     ])
-    # Action Group
+    # Action
     action_group = GroupAction(actions=[
         node_group,
         launch_group
@@ -238,13 +206,8 @@ def generate_launch_description():
             ]
         )
     )
-    
-    # Event Group
-    event_group = GroupAction(actions=[
-        ros2bag_record_event,
-    ])
 
     return LaunchDescription([   
         action_group, 
-        event_group
+        ros2bag_record_event
     ])
