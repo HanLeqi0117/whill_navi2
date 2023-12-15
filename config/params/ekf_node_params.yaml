@@ -127,40 +127,40 @@ ekf_filter_node:
         odom0_pose_rejection_threshold: 5.0
         odom0_twist_rejection_threshold: 5.0  # 1.0(default)
 
-        # Further input parameter examples
-        odom1: example/odom2
-        odom1_config: [false, false, true,
-                       false, false, false,
-                       false, false, false,
-                       false, false, true,
-                       false, false, false]
-        odom1_differential: false
-        odom1_relative: true
-        odom1_queue_size: 2
-        odom1_pose_rejection_threshold: 2.0
-        odom1_twist_rejection_threshold: 0.2
-        pose0: example/pose
-        pose0_config: [true,  true,  false,
-                       false, false, false,
-                       false, false, false,
-                       false, false, false,
-                       false, false, false]
-        pose0_differential: true
-        pose0_relative: false
-        pose0_queue_size: 5
-        pose0_rejection_threshold: 2.0  # Note the difference in parameter name
+        # # Further input parameter examples
+        # odom1: example/odom2
+        # odom1_config: [false, false, true,
+        #                false, false, false,
+        #                false, false, false,
+        #                false, false, true,
+        #                false, false, false]
+        # odom1_differential: false
+        # odom1_relative: true
+        # odom1_queue_size: 2
+        # odom1_pose_rejection_threshold: 2.0
+        # odom1_twist_rejection_threshold: 0.2
+        # pose0: example/pose
+        # pose0_config: [true,  true,  false,
+        #                false, false, false,
+        #                false, false, false,
+        #                false, false, false,
+        #                false, false, false]
+        # pose0_differential: true
+        # pose0_relative: false
+        # pose0_queue_size: 5
+        # pose0_rejection_threshold: 2.0  # Note the difference in parameter name
 
-        twist0: example/twist
-        twist0_config: [false, false, false,
-                        false, false, false,
-                        true,  true,  true,
-                        false, false, false,
-                        false, false, false]
-        twist0_queue_size: 3
-        twist0_rejection_threshold: 2.0
+        # twist0: example/twist
+        # twist0_config: [false, false, false,
+        #                 false, false, false,
+        #                 true,  true,  true,
+        #                 false, false, false,
+        #                 false, false, false]
+        # twist0_queue_size: 3
+        # twist0_rejection_threshold: 2.0
 
-        # imu0: example/imu
-        imu0: imu/data
+        # imu0
+        imu0: adis/imu/data
         imu0_config: [false, false, false,
                       true,  true,  true,
                       false, false, false,
@@ -175,7 +175,24 @@ ekf_filter_node:
         # [ADVANCED] Some IMUs automatically remove acceleration due to gravity, and others don't. If yours doesn't, please set
         # this to true, and *make sure* your data conforms to REP-103, specifically, that the data is in ENU frame.
         imu0_remove_gravitational_acceleration: true
+        
+        # imu1
+        imu1: witmotion/imu/data
+        imu1_config: [false, false, true,
+                      true,  true,  true,
+                      false, false, false,
+                      false, false, false]
+        imu1_differential: false
+        imu1_relative: true
+        imu1_queue_size: 10  # 5(default)
+        imu1_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
+        imu1_twist_rejection_threshold: 0.8                #
+        imu1_linear_acceleration_rejection_threshold: 0.8  #
 
+        # [ADVANCED] Some IMUs automatically remove acceleration due to gravity, and others don't. If yours doesn't, please set
+        # this to true, and *make sure* your data conforms to REP-103, specifically, that the data is in ENU frame.
+        imu1_remove_gravitational_acceleration: true
+        
         # [ADVANCED]  The EKF and UKF models follow a standard predict/correct cycle. During prediction, if there is no
         # acceleration reference, the velocity at time t+1 is simply predicted to be the same as the velocity at time t. During
         # correction, this predicted value is fused with the measured value to produce the new velocity estimate. This can be

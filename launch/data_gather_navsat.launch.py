@@ -25,7 +25,7 @@ def generate_launch_description():
 
     launcharg_path = os.path.join(
         get_package_share_directory('whill_navi2'),
-        'config', 'launch_arg', 'sensor_launch_arg.yaml'
+        'config', 'launch_arg', 'sensor_launch_navsat_arg.yaml'
     )
     with open(launcharg_path) as f:
         launcharg_sensor = yaml.safe_load(f)['sensor_launch']
@@ -119,15 +119,37 @@ def generate_launch_description():
         name='make_dir_node',
         parameters=[paramspath_make_dir]
     )
-    # Parameter YAML file: config/param/ekf_node_params.yaml
-    ekf_odometry_node = Node(
+    # Parameter YAML file: config/param/dual_navsat_params.yaml
+    ekf_filter_node_odom_node = Node(
         package='robot_localization',
         executable='ekf_node',
-        name='ekf_filter_node',
+        name='ekf_filter_node_odom',
         parameters=[
             os.path.join(
                 get_package_share_directory('whill_navi2'),
-                'config', 'params', 'ekf_node_params.yaml'
+                'config', 'params', 'dual_ekf_navsat_params.yaml'
+            )
+        ]
+    )
+    ekf_filter_node_map_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node_map',
+        parameters=[
+            os.path.join(
+                get_package_share_directory('whill_navi2'),
+                'config', 'params', 'dual_ekf_navsat_params.yaml'
+            )
+        ]
+    )
+    navsat_transform_node = Node(
+        package='robot_localization',
+        executable='navsat_transform_node',
+        name='navsat_transform',
+        parameters=[
+            os.path.join(
+                get_package_share_directory('whill_navi2'),
+                'config', 'params', 'dual_ekf_navsat_params.yaml'
             )
         ]
     )
@@ -172,7 +194,9 @@ def generate_launch_description():
     # Node
     node_group = GroupAction(actions=[
         make_dir_node,
-        ekf_odometry_node,
+        ekf_filter_node_odom_node,
+        ekf_filter_node_map_node,
+        navsat_transform_node,
         rviz2_node
     ])
     # Action

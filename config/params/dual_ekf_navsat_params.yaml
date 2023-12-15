@@ -15,7 +15,8 @@ ekf_filter_node_odom:
     base_link_frame: base_link
     world_frame: odom
 
-    odom0: odometry/wheel
+    # whill odometry
+    odom0: whill/odometry
     odom0_config: [false, false, false,
                   false, false, false,
                   true,  true,  true,
@@ -25,7 +26,8 @@ ekf_filter_node_odom:
     odom0_differential: false
     odom0_relative: false
 
-    imu0: imu/data
+    # adis16465
+    imu0: adis/imu/data
     imu0_config: [false, false, false,
                   true,  true,  false,
                   false, false, false,
@@ -35,6 +37,18 @@ ekf_filter_node_odom:
     imu0_relative: false
     imu0_queue_size: 10
     imu0_remove_gravitational_acceleration: true
+
+    # wt901
+    imu1: witmotion/imu/data
+    imu1_config: [false, false, false,
+                  true,  true,  false,
+                  false, false, false,
+                  true,  true,  true,
+                  true,  true,  true]
+    imu1_differential: false
+    imu1_relative: false
+    imu1_queue_size: 10
+    imu1_remove_gravitational_acceleration: true
 
     use_control: false
 
@@ -57,7 +71,8 @@ ekf_filter_node_map:
     base_link_frame: base_link
     world_frame: map
 
-    odom0: odometry/wheel
+    # whill odometry
+    odom0: whill/odometry
     odom0_config: [false, false, false,
                   false, false, false,
                   true,  true,  true,
@@ -67,6 +82,7 @@ ekf_filter_node_map:
     odom0_differential: false
     odom0_relative: false
 
+    # navsat_transform output
     odom1: odometry/gps
     odom1_config: [true,  true,  false,
                   false, false, false,
@@ -77,7 +93,8 @@ ekf_filter_node_map:
     odom1_differential: false
     odom1_relative: false
 
-    imu0: imu/data
+    # adis16465
+    imu0: adis/imu/data
     imu0_config: [false, false, false,
                   true,  true,  false,
                   false, false, false,
@@ -87,6 +104,18 @@ ekf_filter_node_map:
     imu0_relative: false
     imu0_queue_size: 10
     imu0_remove_gravitational_acceleration: true
+
+    # wt901
+    imu1: witmotion/imu/data
+    imu1_config: [false, false, false,
+                  true,  true,  false,
+                  false, false, false,
+                  true,  true,  true,
+                  true,  true,  true]
+    imu1_differential: false
+    imu1_relative: false
+    imu1_queue_size: 10
+    imu1_remove_gravitational_acceleration: true
 
     use_control: false
 
@@ -105,4 +134,5 @@ navsat_transform:
     publish_filtered_gps: true
     use_odometry_yaw: false
     wait_for_datum: false
+    datum: [34.7744444, 135.5112547, 0.0]  # when "wait_for_datum" is true, set datum with "datum" like [latitude, longitude, yaw]
 

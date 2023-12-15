@@ -69,8 +69,6 @@ def generate_launch_description():
     enable_cmd_vel_topic_arg = DeclareLaunchArgument('enable_cmd_vel_topic', default_value='true')
     odometry_topic_name_arg = DeclareLaunchArgument('odometry_topic_name', default_value='odometry')
     
-    
-    
     # 起動するノードのオブジェクトの宣言
     robot_state_publisher_node = Node(
         package='robot_state_publisher',                                # パッケージの名前

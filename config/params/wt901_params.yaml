@@ -1,12 +1,12 @@
 witmotion:
   ros__parameters:
-    port: /dev/ttyUSB0
+    port: /dev/ttyUSB1
     baud_rate: 115200  # baud
     polling_interval: 100  # ms
     timeout_ms: 150  # ms
     restart_service_name: /restart_imu
     imu_publisher:
-      topic_name: imu
+      topic_name: witmotion/imu/data
       frame_id: imu_wit
       use_native_orientation: false  # if true, using magnetometer instead of imu data
       measurements:
