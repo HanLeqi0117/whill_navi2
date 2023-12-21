@@ -12,8 +12,8 @@ from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdow
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
-# input: path of directory.
-# output: list of the directory names in the path
+#: path of directory.
+#: list of the directory names in the path
 def list_files_in_directory(path):
     dir_list = []
     for root, dirs, files in os.walk(path):
@@ -120,26 +120,41 @@ def generate_launch_description():
         parameters=[paramspath_make_dir]
     )
     # Parameter YAML file: config/param/dual_navsat_params.yaml
-    ekf_filter_node_odom_node = Node(
+    ekf_filter_node_local_node = Node(
         package='robot_localization',
         executable='ekf_node',
-        name='ekf_filter_node_odom',
+        name='ekf_filter_node_local',
         parameters=[
             os.path.join(
                 get_package_share_directory('whill_navi2'),
                 'config', 'params', 'dual_ekf_navsat_params.yaml'
             )
+        ],
+        # Remapping
+        # OUTPUT
+        # From "odometry/filtered" to NAVSAT
+        remappings=[
+            ("odometry/filtered", "odometry/filtered/local")
         ]
     )
-    ekf_filter_node_map_node = Node(
+    ekf_filter_node_global_node = Node(
         package='robot_localization',
         executable='ekf_node',
-        name='ekf_filter_node_map',
+        name='ekf_filter_node_global',
         parameters=[
             os.path.join(
                 get_package_share_directory('whill_navi2'),
                 'config', 'params', 'dual_ekf_navsat_params.yaml'
             )
+        ],
+        # Remapping
+        # INPUT
+        # From "odometry/gps" to NAVSAT
+        # OUTPUT
+        # From "odometry/filtered" to NAVSAT
+        remappings=[
+            ("odometry/filtered", "odometry/filtered/global"),
+            ("odometry/gps", "odometry/gps"),  
         ]
     )
     navsat_transform_node = Node(
@@ -151,6 +166,21 @@ def generate_launch_description():
                 get_package_share_directory('whill_navi2'),
                 'config', 'params', 'dual_ekf_navsat_params.yaml'
             )
+        ],
+        # Remapping
+        # INPUT
+        # From "gps/fix" to UBLOX
+        # From "imu" to WITMOTION
+        # From "odometry/filtered" to GLOBAL_EKF
+        # OUTPUT
+        # From "odometry/gps" to GLOBAL_EKF
+        # From "gps/filtered" to WHICH_NEEDS_IT
+        remappings=[
+            ("gps/fix", "ublox/fix"),
+            ("gps/filtered", "gps/filtered"),
+            ("imu", "witmotion/imu/data"),
+            ("odometry/gps", "odometry/gps"),
+            ("odometry/filtered", "odometry/filtered/global")
         ]
     )
     # Rviz config file: config/rviz2/data_gather_launch.rviz
@@ -194,8 +224,8 @@ def generate_launch_description():
     # Node
     node_group = GroupAction(actions=[
         make_dir_node,
-        ekf_filter_node_odom_node,
-        ekf_filter_node_map_node,
+        ekf_filter_node_local_node,
+        ekf_filter_node_global_node,
         navsat_transform_node,
         rviz2_node
     ])

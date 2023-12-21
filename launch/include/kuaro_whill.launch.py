@@ -52,7 +52,7 @@ def generate_launch_description():
         name='robot_state_publisher',                                   # ノードの名前
         arguments=[whill_model_urdf_path],                              # Nodeに与える引数、
         parameters=[{'robot_description': robot_description}],          # ROSのパラメータ
-        remappings=[('/joint_states', '/whill/states/jointState')],     # トピックのremap
+        remappings=[('joint_states', 'whill/states/jointState')],     # トピックのremap
         output='screen'                                                 # ログをコンソール画面に出力する
     )
     # Parameter YAML file: config/param/ros2_whill_params.yaml
@@ -68,7 +68,7 @@ def generate_launch_description():
         package='joy',
         executable='joy_node',
         name='joy_node',
-        remappings=[('joy', 'whill/controller/joy')],
+        namespace='joy_node',
         output='screen'
     )
     # Parameter YAML file: config/param/whill_joy2_params.yaml
@@ -79,9 +79,9 @@ def generate_launch_description():
         output='screen',
         parameters=[whill_joy2_params_path],
         remappings=[
-            ('joy_state', 'joy_state'),
-            ('controller/joy', 'controller/joy'),
-            ('controller/cmd_vel', 'controller/cmd_vel')
+            ('joy_state', 'joy_node/joy'),
+            ('controller/joy', 'whill/controller/joy'),
+            ('controller/cmd_vel', 'vel_to_joy/cmd_vel')
         ]
     )
     
