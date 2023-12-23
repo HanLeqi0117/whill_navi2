@@ -32,7 +32,7 @@ def generate_launch_description():
             
     launcharg_path = os.path.join(
         get_package_share_directory('whill_navi2'),
-        'config', 'launch_arg', 'tf2_static_launch.yaml'
+        'config', 'launch_arg', 'tf2_static_launch_arg.yaml'
     )
     with open(launcharg_path) as f:
         launcharg_tf2_static = yaml.safe_load(f)['tf2_static_launch']    

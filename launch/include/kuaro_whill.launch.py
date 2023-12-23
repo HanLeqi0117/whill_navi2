@@ -68,28 +68,37 @@ def generate_launch_description():
         package='joy',
         executable='joy_node',
         name='joy_node',
-        namespace='joy_node',
+        remappings=[
+            ("joy", "whill/controller/joy")
+        ],
         output='screen'
     )
+    # joy_node = Node(
+    #     package='joy',
+    #     executable='joy_node',
+    #     name='joy_node',
+    #     namespace='joy_node',
+    #     output='screen'
+    # )
     # Parameter YAML file: config/param/whill_joy2_params.yaml
-    whill_joy2_node = Node(
-        package='ros2_whill',
-        executable='whill_joy2',
-        name='whill_joy2',
-        output='screen',
-        parameters=[whill_joy2_params_path],
-        remappings=[
-            ('joy_state', 'joy_node/joy'),
-            ('controller/joy', 'whill/controller/joy'),
-            ('controller/cmd_vel', 'vel_to_joy/cmd_vel')
-        ]
-    )
+    # whill_joy2_node = Node(
+    #     package='ros2_whill',
+    #     executable='whill_joy2',
+    #     name='whill_joy2',
+    #     output='screen',
+    #     parameters=[whill_joy2_params_path],
+    #     remappings=[
+    #         ('joy_state', 'joy_node/joy'),
+    #         ('controller/joy', 'whill/controller/joy'),
+    #         ('controller/cmd_vel', 'vel_to_joy/cmd_vel')
+    #     ]
+    # )
     
     node_group = GroupAction(actions=[
         robot_state_publisher_node,
         ros2_whill_node,
         joy_node,
-        whill_joy2_node
+        # whill_joy2_node
     ])   
             
     return LaunchDescription([

@@ -63,7 +63,6 @@ def generate_launch_description():
         package="adi_driver",                                           # パッケージの名前
         executable="adis16465_node",                                    # 実行ファイルの名前
         name="adis16465_node",                                          # ノードの名前
-        namespace="imu",                                                # ノードのネームスペース
         parameters=[{
             "device": LaunchConfiguration("device"),
              "frame_id": LaunchConfiguration("frame_id"),
@@ -72,7 +71,7 @@ def generate_launch_description():
              "rate": LaunchConfiguration("rate")
         }],
         remappings=[
-            ("imu/data_raw", LaunchConfiguration(raw_data_topic_arg.name))
+            ("data_raw", LaunchConfiguration(raw_data_topic_arg.name))
         ],
         output="screen"                                                 # ターミナルにLogを出力する
     )

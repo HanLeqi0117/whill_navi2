@@ -1,5 +1,5 @@
 ublox_gnss_launch:
-  use_rtk: 'false'
+  use_rtk: 'true'
   port: '/dev/ttyACM1'
   debug: 'false'
   check_gga: 'true'
