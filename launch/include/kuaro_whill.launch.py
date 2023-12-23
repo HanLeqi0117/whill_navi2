@@ -62,6 +62,9 @@ def generate_launch_description():
         name='ros2_whill',
         output='screen',
         namespace='whill',
+        remappings=[
+            ("odom", "odometry")
+        ],
         parameters=[ros2_whill_yaml_path]
     )
     joy_node = Node(
@@ -99,7 +102,7 @@ def generate_launch_description():
         ros2_whill_node,
         joy_node,
         # whill_joy2_node
-    ])   
+    ])
             
     return LaunchDescription([
         node_group
