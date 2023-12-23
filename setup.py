@@ -1,6 +1,7 @@
 from setuptools import find_packages, setup
 import os
 from glob import glob
+from ament_index_python.packages import get_package_share_directory
 
 # Packageの名前
 package_name = 'whill_navi2'
@@ -54,3 +55,17 @@ setup(
         ],
     },
 )
+
+try:
+    os.link(
+        os.path.join(
+            get_package_share_directory("whill_navi2"),
+            "config", "params", "make_dir_node_params.yaml"
+        ),
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "data_dir_manager"
+        )
+    )
+except OSError as e:
+    pass
