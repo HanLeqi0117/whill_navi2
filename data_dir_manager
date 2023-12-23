@@ -1,7 +1,7 @@
 make_dir_node:
   ros__parameters:
     ws_path: whill_ws_iron
-    place_path: rinpukan
+    place_path: F42
     date_path: "2023_11_23"
     bag_path: bag
     map_path: map
@@ -9,7 +9,7 @@ make_dir_node:
     branchpoint_path: branchpoint
     rewaypoint_path: rewaypoint
     remap_path: remap_path
-    bag_name: for_navsats
+    bag_name: test
     map_name: map
     remap_name: remap.yaml
     waypoint_name: waypoint.txt

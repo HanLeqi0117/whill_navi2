@@ -5,8 +5,8 @@ ekf_filter_node_local:
     frequency: 30.0
     sensor_timeout: 0.1
     two_d_mode: false
-    transform_time_offset: 0.0
-    transform_timeout: 0.0
+    transform_time_offset: 0.5
+    transform_timeout: 0.5
     print_diagnostics: true
     debug: false
 
@@ -61,8 +61,8 @@ ekf_filter_node_global:
     frequency: 30.0
     sensor_timeout: 0.1
     two_d_mode: false
-    transform_time_offset: 0.0
-    transform_timeout: 0.0
+    transform_time_offset: 0.5
+    transform_timeout: 0.5
     print_diagnostics: true
     debug: false
 

@@ -19,7 +19,7 @@ def generate_launch_description():
     general_debug_arg = DeclareLaunchArgument(name="debug", default_value='true')
     f9p_use_rtk_arg = DeclareLaunchArgument(name="use_rtk", default_value='false')
     f9p_port_arg = DeclareLaunchArgument(name="port", default_value="/dev/ttyACM0")
-    frame_id_arg = DeclareLaunchArgument(name="frame_id", default_value="gnss")  
+    frame_id_arg = DeclareLaunchArgument(name="frame_id", default_value="ublox")  
     serial_baud_arg = DeclareLaunchArgument(name="serial_baud", default_value="230400")  
     rate_arg = DeclareLaunchArgument(name="rate", default_value="20.0")  
     ntrip_usrname_arg = DeclareLaunchArgument(name="ntrip_usrname", default_value="8wna5x52")  
