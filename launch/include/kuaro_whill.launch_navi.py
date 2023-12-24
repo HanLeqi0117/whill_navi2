@@ -33,7 +33,7 @@ def generate_launch_description():
         get_package_share_directory('whill_navi2'),
         'config',
         'params',
-        'whill_joy2_params.yaml'
+        'whill_joy2_params_navi.yaml'
     )
     whill_model_urdf_file = xacro.process_file(whill_model_xacro_path)
     robot_description = whill_model_urdf_file.toprettyxml(indent='\t')

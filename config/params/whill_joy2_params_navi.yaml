@@ -9,5 +9,5 @@ whill_joy2:
     buttons_rotation_R: 5
     buttons_rotation_L: 2
     buttons_straight: 2
-    cmd_only: false
+    cmd_only: true
     frequency: 10
