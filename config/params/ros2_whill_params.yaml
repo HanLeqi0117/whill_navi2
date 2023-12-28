@@ -8,4 +8,4 @@ whill/ros2_whill:
     send_interval: 20
     enable_cmd_vel_control: false
     base_frame_id: "base_link"
-    odom_frame_id: "odom"
+    odom_frame_id: "whill_odom"
