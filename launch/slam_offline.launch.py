@@ -80,32 +80,45 @@ def generate_launch_description():
     )
     
     # Event
-    map_saver_cli_lifecycle_node_configure_event = RegisterEventHandler(
-        OnProcessStart(
-            target_action=slam_offline_rviz2_node,
-            on_start=[
-                slam_offline_process,
-                ros2bag_play_process,
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(map_saver_cli_lifecycle_node),
-                        transition_id=Transition.TRANSITION_CONFIGURE
-                    )
-                )
-            ]
-        )
-    )
-    map_saver_cli_lifecycle_node_activate_event = RegisterEventHandler(
+    # map_saver_cli_lifecycle_node_configure_event = RegisterEventHandler(
+    #     OnProcessStart(
+    #         target_action=slam_offline_rviz2_node,
+    #         on_start=[
+    #             slam_offline_process,
+    #             ros2bag_play_process,
+    #             EmitEvent(
+    #                 event=lifecycle.ChangeState(
+    #                     lifecycle_node_matcher=matches_action(map_saver_cli_lifecycle_node),
+    #                     transition_id=Transition.TRANSITION_CONFIGURE
+    #                 )
+    #             )
+    #         ]
+    #     )
+    # )
+    # map_saver_cli_lifecycle_node_activate_event = RegisterEventHandler(
+    #     OnExecutionComplete(
+    #         target_action=ros2bag_play_process,
+    #         on_completion=[
+    #             LogInfo(msg="Bag Play is over, and going to save Map."),
+    #             EmitEvent(
+    #                 event=lifecycle.ChangeState(
+    #                     lifecycle_node_matcher=matches_action(map_saver_cli_lifecycle_node),
+    #                     transition_id=Transition.TRANSITION_ACTIVATE
+    #                 )
+    #             ),
+    #             TimerAction(
+    #                 actions=[Shutdown()],
+    #                 period=1.0
+    #             )
+    #         ]
+    #     )
+    # )
+    map_saver_cli_lifecycle_node_process = RegisterEventHandler(
         OnExecutionComplete(
             target_action=ros2bag_play_process,
             on_completion=[
                 LogInfo(msg="Bag Play is over, and going to save Map."),
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(map_saver_cli_lifecycle_node),
-                        transition_id=Transition.TRANSITION_ACTIVATE
-                    )
-                ),
+                map_saver_cli_lifecycle_node,
                 TimerAction(
                     actions=[Shutdown()],
                     period=1.0
@@ -123,8 +136,11 @@ def generate_launch_description():
 
     return LaunchDescription([
         slam_offline_rviz2_node,
-        map_saver_cli_lifecycle_node_configure_event,
-        map_saver_cli_lifecycle_node_activate_event,
+        ros2bag_play_process,
+        slam_offline_process,
+        map_saver_cli_lifecycle_node_process,
+        # map_saver_cli_lifecycle_node_configure_event,
+        # map_saver_cli_lifecycle_node_activate_event,
         mv_map_to_remap_event
     ])
 
