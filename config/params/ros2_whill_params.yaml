@@ -7,5 +7,6 @@ whill/ros2_whill:
     wheel_radius: 0.135
     send_interval: 20
     enable_cmd_vel_control: false
+    publish_tf: false
     base_frame_id: "base_link"
-    odom_frame_id: "whill_odom"
+    odom_frame_id: "odom"
