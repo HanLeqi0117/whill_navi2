@@ -2,16 +2,14 @@ from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
     
-    mkdir_params_data = get_node_params_dict("whill_navi2", 'make_dir_node_params.yaml', "make_dir_node")
-    locla_ekf_params_data = get_node_params_dict("whill_navi2", "dual_ekf_navsat_params.yaml", "ekf_filter_node_local")
-    golbal_ekf_params_data = get_node_params_dict("whill_navi2", "dual_ekf_navsat_params.yaml", "ekf_filter_node_global")
-    navsat_params_data = get_node_params_dict("whill_navi2", "dual_ekf_navsat_params.yaml", "navsat_transform_node")
+    mkdir_params_yaml_path = get_yaml_path("whill_navi2", "make_dir_node_params.yaml")
+    navsat_ekf_params_yaml_path = get_yaml_path("whill_navi2", "dual_ekf_navsat_params.yaml")
     sensor_launch_path = get_include_launch_path("whill_navi2", "sensor.launch.py")
     kuaro_whill_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
     tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
     rviz_path = get_rviz_path("whill_navi2", "data_gather_navsat_launch.rviz")
-    
-    backup_bagfile()
+    data_path = DataPath()
+    data_path.backup_bagfile()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -56,14 +54,14 @@ def generate_launch_description():
     make_dir_node = Node(
         package='whill_navi2',
         executable='make_dir_node',
-        parameters=[mkdir_params_data]
+        parameters=[mkdir_params_yaml_path]
     )
     # Parameter YAML file: config/param/dual_navsat_params.yaml
     ekf_filter_node_local_node = Node(
         package='robot_localization',
         executable='ekf_node',
         name='ekf_filter_node_local',
-        parameters=[locla_ekf_params_data],
+        parameters=[navsat_ekf_params_yaml_path],
         # Remapping
         # OUTPUT
         # From "odometry/filtered" to NAVSAT
@@ -75,7 +73,7 @@ def generate_launch_description():
         package='robot_localization',
         executable='ekf_node',
         name='ekf_filter_node_global',
-        parameters=[golbal_ekf_params_data],
+        parameters=[navsat_ekf_params_yaml_path],
         # Remapping
         # INPUT
         # From "odometry/gps" to NAVSAT
@@ -89,7 +87,7 @@ def generate_launch_description():
     navsat_transform_node = Node(
         package='robot_localization',
         executable='navsat_transform_node',
-        parameters=[navsat_params_data],
+        parameters=[navsat_ekf_params_yaml_path],
         # Remapping
         # INPUT
         # From "gps/fix" to UBLOX
@@ -118,7 +116,7 @@ def generate_launch_description():
     ros2bag_record_process = ExecuteProcess(
         cmd=[
             FindExecutable(name='ros2'),
-            'bag', 'record', '--all', '-o', get_data_path().bag_path
+            'bag', 'record', '--all', '-o', data_path.bag_path
         ]
     )
 

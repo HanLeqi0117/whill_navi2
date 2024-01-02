@@ -2,12 +2,12 @@ from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
     
-    whill_params_data = get_node_params_dict("whill_navi2", "ros2_whill_params.yaml", "whill/ros2_whill")
-    joy_params_data = get_node_params_dict("whill_navi2", "ros2_whill_params.yaml", "whill_joy2")
+    whill_params_yaml_path = get_yaml_path("whill_navi2", "ros2_whill_params.yaml")
 
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
+
     # Argument
     use_joycon_arg = DeclareLaunchArgument(name="use_joycon", default_value='true')
     
@@ -30,7 +30,7 @@ def generate_launch_description():
         remappings=[
             ("odom", "odometry")
         ],
-        parameters=[whill_params_data]
+        parameters=[whill_params_yaml_path]
     )
     # joy_node = Node(
     #     package='joy',
@@ -53,7 +53,7 @@ def generate_launch_description():
         executable='whill_joy2',
         output='screen',
         parameters=[
-            joy_params_data,
+            whill_params_yaml_path,
             {"use_joycon" : LaunchConfiguration("use_joycon")}
         ],
         remappings=[

@@ -3,8 +3,8 @@ from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
     
-    f9p_params_data = get_node_params_dict("whill_navi2", "zed_f9p_node_params.yaml", "zed_f9p_node")
-    ntrip_params_data = get_node_params_dict("whill_navi2", "zed_f9p_node_params.yaml", "ntrip_client_node")
+    f9p_params_yaml_path = get_yaml_path("whill_navi2", "zed_f9p_node_params.yaml")
+    f9p_params_data = get_node_params_dict(f9p_params_yaml_path, "zed_f9p_node")
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -14,7 +14,7 @@ def generate_launch_description():
     zed_f9p_node = Node(
         package="zed_f9p",
         executable="zed_f9p_node",
-        parameters=[f9p_params_data],
+        parameters=[f9p_params_yaml_path],
         remappings=[
             ("nmea", "nmea"),
             ("nmea_gga", "nmea_gga"),
@@ -24,7 +24,7 @@ def generate_launch_description():
     ntrip_node = Node(
         package="zed_f9p",
         executable="ntrip_client_node",
-        parameters=[ntrip_params_data],
+        parameters=[f9p_params_yaml_path],
         remappings=[("rtcm", "rtcm")],
         condition=IfCondition(str(f9p_params_data['use_rtk']))
     )

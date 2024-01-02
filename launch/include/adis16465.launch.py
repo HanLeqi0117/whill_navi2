@@ -2,8 +2,7 @@ from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
     
-    adis16465_params_data = get_node_params_dict("whill_navi2", "adis16465_node_params.yaml", "adis16465_node")
-    imu_filter_params_data = get_node_params_dict("whill_navi2", "adis16465_node_params.yaml", "adis_imu_filter_node")
+    adis16465_params_yaml_path = get_yaml_path("whill_navi2", 'adis16465_node_params.yaml')
 
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -13,7 +12,7 @@ def generate_launch_description():
     imu_node = Node(
         package="adi_driver",                                           # パッケージの名前
         executable="adis16465_node",                                    # 実行ファイルの名前
-        parameters=[adis16465_params_data],
+        parameters=[adis16465_params_yaml_path],
         remappings=[
             ("data_raw", "adis/imu/data_raw")
         ],
@@ -24,7 +23,7 @@ def generate_launch_description():
         package="imu_filter_madgwick",                                  # パッケージの名前
         executable="imu_filter_madgwick_node",                          # 実行ファイルの名前
         name="adis_imu_filter_node",
-        parameters=[imu_filter_params_data],
+        parameters=[adis16465_params_yaml_path],
         remappings=[
             ("imu/data_raw", "adis/imu/data_raw"),
             ("imu/data", "adis/imu/data"),

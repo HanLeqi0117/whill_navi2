@@ -2,14 +2,14 @@ from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
     
-    mkdir_params_data = get_node_params_dict("whill_navi2", 'make_dir_node_params.yaml', "make_dir_node")
-    ekf_params_data = get_node_params_dict("whill_navi2", "ekf_node_params.yaml", "ekf_filter_node")
+    mkdir_params_yaml_path = get_yaml_path("whill_navi2", "make_dir_node_params.yaml")
+    ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_filter_node.yaml")
     sensor_launch_path = get_include_launch_path("whill_navi2", "sensor.launch.py")
     kuaro_whill_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
     tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
     rviz_path = get_rviz_path("whill_navi2", "data_gather_launch.rviz")
-    
-    backup_bagfile()
+    data_path = DataPath()
+    data_path.backup_bagfile()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -54,14 +54,14 @@ def generate_launch_description():
     make_dir_node = Node(
         package='whill_navi2',
         executable='make_dir_node',
-        parameters=[mkdir_params_data]
+        parameters=[mkdir_params_yaml_path]
     )
     # Parameter YAML file: config/param/ekf_node_params.yaml
     ekf_odometry_node = Node(
         package='robot_localization',
         executable='ekf_node',
         name='ekf_filter_node',
-        parameters=[ekf_params_data]
+        parameters=[ekf_params_yaml_path]
     )
     # Rviz config file: config/rviz2/data_gather_launch.rviz
     rviz2_node = Node(
@@ -75,7 +75,7 @@ def generate_launch_description():
     ros2bag_record_process = ExecuteProcess(
         cmd=[
             FindExecutable(name='ros2'),
-            'bag', 'record', '--all', '-o', get_data_path().bag_path
+            'bag', 'record', '--all', '-o', data_path.bag_path
         ]
     )
 

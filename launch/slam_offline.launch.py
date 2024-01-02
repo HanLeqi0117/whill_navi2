@@ -2,8 +2,8 @@ from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
 
-    slam_params_data = get_node_params_dict("whill_navi2", "slam_toolbox_params.yaml", "slam_toolbox")
-    data_path = get_data_path()
+    slam_params_yaml_path = get_yaml_path("whill_navi2", "slam_toolbox_params.yaml")
+    data_path = DataPath()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -20,7 +20,7 @@ def generate_launch_description():
         package='slam_toolbox',
         executable='sync_slam_toolbox_node',    
         name='slam_toolbox',
-        parameters=[slam_params_data],
+        parameters=[slam_params_yaml_path],
         output='screen'
     )
     map_saver_cli_node = Node(
@@ -38,11 +38,7 @@ def generate_launch_description():
     # Process Action
     bag_play_process = ExecuteProcess(
         cmd=[
-            "ros2", "bag", "play", "--rate 0.6",
-            os.path.join(
-                data_path.bag_path,
-                data_path.bag_name
-            )
+            "ros2", "bag", "play", "--rate 0.6", data_path.bag_path
         ]
     )
     

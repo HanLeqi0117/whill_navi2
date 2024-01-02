@@ -9,16 +9,6 @@ from launch.substitutions import LaunchConfiguration, FindExecutable
 from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
-
-class DataPath:
-    bag_name = bag_dir = branchpoint_dir = \
-    date_dir = map_name = map_dir = \
-    place_dir = remap_name = remap_dir = \
-    rewaypoint_name = rewaypoint_dir = waypoint_name = \
-    waypoint_dir = ws_dir = backup_bag_dir = ''
-    
-    bag_path = map_path = remap_map = \
-    waypoint_path = rewaypoint_path = ''
         
 # input: path of directory.
 # output: list of the directory names in the path
@@ -37,12 +27,9 @@ def get_yaml_path(package_name = str, yaml_file_name = str):
         'config', 'params', yaml_file_name
     )
 
-def get_node_params_dict(package_name = str, yaml_file_name = str, node_name = str):
-    
-    yaml_path = get_yaml_path(package_name, yaml_file_name)
+def get_node_params_dict(yaml_path = str, node_name = str):
     with open(yaml_path) as f:
         data = ruamel.yaml.safe_load(f)[node_name]["ros__parameters"]
-    
     return data
 
 
@@ -64,57 +51,55 @@ def get_rviz_path(package_name = str, rviz_filename = str):
         "config", "rviz2", rviz_filename
     )
 
-def get_data_path():
-    
-    mkdir_node_params_dict = get_node_params_dict('whill_navi2', 'make_dir_node_params.yaml', 'make_dir_node')
-    base_dir = os.path.join(
-        os.environ['HOME'],
-        mkdir_node_params_dict['ws_dir'],
-        'full_data',
-        str(mkdir_node_params_dict['date_dir']),
-        mkdir_node_params_dict['place_dir']
-    )
 
-    data_path = DataPath()
-    data_path.bag_dir = os.path.join(base_dir, mkdir_node_params_dict['bag_dir'])
-    data_path.backup_bag_dir = os.path.join(base_dir, 'backup_bag')
-    data_path.map_dir = os.path.join(base_dir, mkdir_node_params_dict['map_dir'])
-    data_path.remap_dir = os.path.join(base_dir, mkdir_node_params_dict['remap_dir'])
-    data_path.waypoint_dir = os.path.join(base_dir, mkdir_node_params_dict['waypoint_dir'])
-    data_path.rewaypoint_dir = os.path.join(base_dir, mkdir_node_params_dict['rewaypoint_dir'])
+class DataPath:
     
-    data_path.bag_name = mkdir_node_params_dict['bag_name']
-    data_path.map_name = mkdir_node_params_dict['map_name']
-    data_path.remap_name = mkdir_node_params_dict['remap_name']
-    data_path.waypoint_name = mkdir_node_params_dict['waypoint_name']
-    data_path.rewaypoint_name = mkdir_node_params_dict['rewaypoint_name']
-    
-    data_path.bag_path = os.path.join(data_path.bag_dir, data_path.bag_name)
-    data_path.map_path = os.path.join(data_path.map_dir, data_path.map_name)
-    data_path.remap_map = os.path.join(data_path.remap_dir, data_path.remap_name)
-    data_path.waypoint_path = os.path.join(data_path.waypoint_dir, data_path.waypoint_name)
-    data_path.rewaypoint_path = os.path.join(data_path.rewaypoint_dir, data_path.rewaypoint_name)
-    
-    return data_path
+    def __init__(self):
+        mkdir_params_yaml_path = get_yaml_path('whill_navi2', 'make_dir_node_params.yaml')
+        mkdir_node_params_dict = get_node_params_dict(mkdir_params_yaml_path, 'make_dir_node')
+        base_dir = os.path.join(
+            os.environ['HOME'],
+            mkdir_node_params_dict['ws_dir'],
+            'full_data',
+            str(mkdir_node_params_dict['date_dir']),
+            mkdir_node_params_dict['place_dir']
+        )
 
-def backup_bagfile():
-    data_path = get_data_path()
-    
-    if os.path.exists(data_path.bag_dir):
-        bag_name_list = list_files_in_directory(data_path.bag_dir)
-        if len(bag_name_list) > 0:
-            for bag_name in bag_name_list:
-                if bag_name == data_path.bag_name:
-                    backup_bag_file = bag_name + '_{:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
-                    if os.path.exists(data_path.backup_bag_dir):
-                        shutil.move(
-                            os.path.join(data_path.bag_dir, data_path.bag_name),
-                            os.path.join(data_path.backup_bag_dir, backup_bag_file)
-                        )
-                    else:
-                        os.makedirs(data_path.backup_bag_dir)
-                        shutil.move(
-                            os.path.join(data_path.bag_dir, data_path.bag_name),
-                            os.path.join(data_path.backup_bag_dir, backup_bag_file)
-                        )
+        self.bag_dir = os.path.join(base_dir, mkdir_node_params_dict['bag_dir'])
+        self.backup_bag_dir = os.path.join(base_dir, 'backup_bag')
+        self.map_dir = os.path.join(base_dir, mkdir_node_params_dict['map_dir'])
+        self.remap_dir = os.path.join(base_dir, mkdir_node_params_dict['remap_dir'])
+        self.waypoint_dir = os.path.join(base_dir, mkdir_node_params_dict['waypoint_dir'])
+        self.rewaypoint_dir = os.path.join(base_dir, mkdir_node_params_dict['rewaypoint_dir'])
+        
+        self.bag_name = mkdir_node_params_dict['bag_name']
+        self.map_name = mkdir_node_params_dict['map_name']
+        self.remap_name = mkdir_node_params_dict['remap_name']
+        self.waypoint_name = mkdir_node_params_dict['waypoint_name']
+        self.rewaypoint_name = mkdir_node_params_dict['rewaypoint_name']
+        
+        self.bag_path = os.path.join(self.bag_dir, self.bag_name)
+        self.map_path = os.path.join(self.map_dir, self.map_name)
+        self.remap_map = os.path.join(self.remap_dir, self.remap_name)
+        self.waypoint_path = os.path.join(self.waypoint_dir, self.waypoint_name)
+        self.rewaypoint_path = os.path.join(self.rewaypoint_dir, self.rewaypoint_name)
+
+    def backup_bagfile(self):
+        if os.path.exists(self.bag_dir):
+            bag_name_list = list_files_in_directory(self.bag_dir)
+            if len(bag_name_list) > 0:
+                for bag_name in bag_name_list:
+                    if bag_name == bag_name:
+                        backup_bag_file = bag_name + '_{:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
+                        if os.path.exists(self.backup_bag_dir):
+                            shutil.move(
+                                os.path.join(self.bag_dir, bag_name),
+                                os.path.join(self.backup_bag_dir, backup_bag_file)
+                            )
+                        else:
+                            os.makedirs(self.backup_bag_dir)
+                            shutil.move(
+                                os.path.join(self.bag_dir, bag_name),
+                                os.path.join(self.backup_bag_dir, backup_bag_file)
+                            )
 
