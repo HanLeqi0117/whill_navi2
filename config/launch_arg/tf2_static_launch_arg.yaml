@@ -1,7 +1,0 @@
-tf2_static_launch:
-  hokuyo_frame: "laser_front"
-  velodyne_frame: "velodyne"
-  adis_imu_frame: "imu_adis"
-  wit_imu_frame: "imu_wit"
-  ublox_frame: "ublox"
-  whill_frame: "base_link"

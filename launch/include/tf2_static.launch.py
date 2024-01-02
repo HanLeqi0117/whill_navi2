@@ -63,10 +63,16 @@ def generate_launch_description():
         name='wit_imu_to_base_link',
         arguments = [
             '--x', '0.44', '--y', '-0.23', '--z', '0.2575', 
-            '--roll', '0.0', '--pitch', '0.0', '--yaw', '1.5707963', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
             '--frame-id', whill_frame_arg.default_value[0].perform('tf2_static_launch'), 
             '--child-frame-id', wit_imu_frame_arg.default_value[0].perform('tf2_static_launch'), 
-        ]       
+        ]
+        # arguments = [
+        #     '--x', '0.44', '--y', '-0.23', '--z', '0.2575', 
+        #     '--roll', '0.0', '--pitch', '0.0', '--yaw', '1.5707963', 
+        #     '--frame-id', whill_frame_arg.default_value[0].perform('tf2_static_launch'), 
+        #     '--child-frame-id', wit_imu_frame_arg.default_value[0].perform('tf2_static_launch'), 
+        # ]           
     )    
     tf2_static_gnss_node = Node(
         package='tf2_ros',

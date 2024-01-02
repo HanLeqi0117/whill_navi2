@@ -22,7 +22,6 @@ import yaml
 #             └── waypoint
 #
 
-
 class MakeDir(Node):
     def __init__(self):
         super().__init__("make_dir_node")
@@ -33,18 +32,18 @@ class MakeDir(Node):
         self._suffix_path_key_list_ = [str]
         
         # Declare Parameters
-        self._ws_param_ = self.declare_parameter("ws_path", "whill2_ws")
-        self._place_param_ = self.declare_parameter("place_path", "nakanoshima")
-        self._date_param_ = self.declare_parameter("date_path", "date_today")
-        self._map_path_param_ = self.declare_parameter("map_path", "map")
-        self._bag_path_param_ = self.declare_parameter("bag_path", "bag")
-        self._waypoint_path_param_ = self.declare_parameter("waypoint_path", "waypoint")
-        self._branchpoint_path_param_ = self.declare_parameter("branchpoint_path", "branchpoint")
+        self._ws_param_ = self.declare_parameter("ws_dir", "whill2_ws")
+        self._place_param_ = self.declare_parameter("place_dir", "nakanoshima")
+        self._date_param_ = self.declare_parameter("date_dir", "date_today")
+        self._map_dir_param_ = self.declare_parameter("map_dir", "map")
+        self._bag_dir_param_ = self.declare_parameter("bag_dir", "bag")
+        self._waypoint_dir_param_ = self.declare_parameter("waypoint_dir", "waypoint")
+        self._branchpoint_dir_param_ = self.declare_parameter("branchpoint_dir", "branchpoint")
 
-        map_path = self._map_path_param_.get_parameter_value().string_value
-        bag_path = self._bag_path_param_.get_parameter_value().string_value
-        waypoint_path = self._waypoint_path_param_.get_parameter_value().string_value
-        branchpoint_path = self._branchpoint_path_param_.get_parameter_value().string_value
+        map_dir = self._map_dir_param_.get_parameter_value().string_value
+        bag_dir = self._bag_dir_param_.get_parameter_value().string_value
+        waypoint_dir = self._waypoint_dir_param_.get_parameter_value().string_value
+        branchpoint_dir = self._branchpoint_dir_param_.get_parameter_value().string_value
 
         # Set variables
         self._prefix_path_ = os.path.join(
@@ -55,16 +54,16 @@ class MakeDir(Node):
             self._place_param_.get_parameter_value().string_value,
         )
         self._suffix_paths_dict_ = {
-            map_path: ["", "re"], 
-            bag_path: ["", "backup_", "production_"], 
-            waypoint_path: ["", "re", "final"], 
-            branchpoint_path: [""]
+            map_dir: ["", "re"], 
+            bag_dir: ["", "backup_", "production_"], 
+            waypoint_dir: ["", "re", "final"], 
+            branchpoint_dir: [""]
         }
         self._suffix_path_key_list_ = [
-            map_path,
-            bag_path,
-            waypoint_path,
-            branchpoint_path
+            map_dir,
+            bag_dir,
+            waypoint_dir,
+            branchpoint_dir
         ]
 
         self.make_dir()
@@ -95,33 +94,6 @@ def main(args=None):
     # rclpy.spin(MakeDir)
     # rclpy.shutdown()
     node = MakeDir()
-
-    paramspath_make_dir = os.path.join(
-        get_package_share_directory('whill_navi2'),
-        'config', 'params', 'make_dir_node_params.yaml'
-    )
-
-    with open(paramspath_make_dir) as f:
-        nodeparams_make_dir = yaml.safe_load(f)['make_dir_node']['ros__parameters']
-        base_path = os.path.join(
-            os.environ['HOME'],
-            nodeparams_make_dir['ws_path'],
-            "full_data",
-            str(nodeparams_make_dir['date_path']),
-            nodeparams_make_dir['place_path']
-        )
-        launcharg_full_data_path = {'full_data_path_launch' : {}}
-        for key, value in nodeparams_make_dir.items():
-            if 'path' in key:
-                launcharg_full_data_path['full_data_path_launch'][key + "_abs"] = (os.path.join(base_path, str(value)))
-            if 'name' in key:
-                launcharg_full_data_path['full_data_path_launch'][key] = value
-            with open(os.path.join(
-                    get_package_share_directory('whill_navi2'),
-                    'config', 'launch_arg', 'full_data_path_launch_arg.yaml'
-                ), 'w') as f:
-                yaml.safe_dump(launcharg_full_data_path, f)
-    
     rclpy.shutdown()
 
 if __name__ == '__main__':

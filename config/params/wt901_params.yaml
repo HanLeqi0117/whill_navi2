@@ -1,4 +1,4 @@
-witmotion:
+witmotion_ros_node:
   ros__parameters:
     port: /dev/ttyUSB1
     baud_rate: 115200  # baud
@@ -6,7 +6,7 @@ witmotion:
     timeout_ms: 150  # ms
     restart_service_name: /restart_imu
     imu_publisher:
-      topic_name: witmotion/imu/data
+      topic_name: witmotion/imu/data_raw
       frame_id: imu_wit
       use_native_orientation: false  # if true, using magnetometer instead of imu data
       measurements:
@@ -61,3 +61,23 @@ witmotion:
     rtc_publisher:
       enabled: false
       topic_name: /witmotion_clock
+
+wit_imu_filter_node:
+  ros__parameters:
+    constant_dt: 0.0
+    declination: 0.0
+    fixed_frame: base_link
+    gain: 0.1
+    mag_bias_x: 0.0
+    mag_bias_y: 0.0
+    mag_bias_z: 0.0
+    orientation_stddev: 0.0
+    publish_debug_topics: false
+    publish_tf: false
+    remove_gravity_vector: false
+    reverse_tf: false
+    stateless: false
+    use_mag: true
+    world_frame: enu
+    yaw_offset: 0.0
+    zeta: 0.0

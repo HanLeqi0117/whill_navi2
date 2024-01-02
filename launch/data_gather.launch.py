@@ -1,76 +1,15 @@
-import os
-import yaml
-import shutil
-import datetime
-
-from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction, GroupAction
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, FindExecutable
-from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown
-from launch.conditions import IfCondition
-from launch_ros.actions import Node
-
-# input: path of directory.
-# output: list of the directory names in the path
-def list_files_in_directory(path):
-    dir_list = []
-    for root, dirs, files in os.walk(path):
-        for dir in dirs:
-            dir_list.append(dir)
-    return sorted(dir_list)
+from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
-
-    launcharg_path = os.path.join(
-        get_package_share_directory('whill_navi2'),
-        'config', 'launch_arg', 'sensor_launch_arg.yaml'
-    )
-    with open(launcharg_path) as f:
-        launcharg_sensor = yaml.safe_load(f)['sensor_launch']
-            
-    launcharg_path = os.path.join(
-        get_package_share_directory('whill_navi2'),
-        'config', 'launch_arg', 'tf2_static_launch_arg.yaml'
-    )
-    with open(launcharg_path) as f:
-        launcharg_tf2_static = yaml.safe_load(f)['tf2_static_launch']    
     
-    paramspath_make_dir = os.path.join(
-        get_package_share_directory('whill_navi2'),
-        'config', 'params', 'make_dir_node_params.yaml'
-    ) 
-    with open(paramspath_make_dir) as f:
-        nodeparams_make_dir = yaml.safe_load(f)['make_dir_node']['ros__parameters']
+    mkdir_params_data = get_node_params_dict("whill_navi2", 'make_dir_node_params.yaml', "make_dir_node")
+    ekf_params_data = get_node_params_dict("whill_navi2", "ekf_node_params.yaml", "ekf_filter_node")
+    sensor_launch_path = get_include_launch_path("whill_navi2", "sensor.launch.py")
+    kuaro_whill_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
+    tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
+    rviz_path = get_rviz_path("whill_navi2", "data_gather_launch.rviz")
     
-    bag_path = os.path.join(
-        os.environ['HOME'],
-        nodeparams_make_dir['ws_path'],
-        'full_data',
-        str(nodeparams_make_dir['date_path']),
-        nodeparams_make_dir['place_path'],
-        nodeparams_make_dir['bag_path']
-    )
-    
-    # if bag_file in bag_path, it will take a backup
-    if os.path.exists(bag_path):
-        bag_files_list = list_files_in_directory(bag_path)
-        if len(bag_files_list) > 0:
-            for bag_file in bag_files_list:
-                backup_bag_path = os.path.join(bag_path, '..', 'backup_bag')
-                backup_bag_file = bag_file + '_{:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
-                if os.path.exists(backup_bag_path):
-                    shutil.move(
-                        os.path.join(bag_path, bag_file),
-                        os.path.join(backup_bag_path, backup_bag_file)
-                    )
-                else:
-                    os.makedirs(backup_bag_path)
-                    shutil.move(
-                        os.path.join(bag_path, bag_file),
-                        os.path.join(backup_bag_path, backup_bag_file)
-                    )
+    backup_bagfile()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -78,37 +17,36 @@ def generate_launch_description():
     
     # Include Launch File
     # sensor Launch
-    # Argument YAML file: config/launch_arg/sensor_launch_arg.yaml
     sensor_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('whill_navi2'),
-                'launch', 'include', 'sensor.launch.py'
-            )
-        ),
-        launch_arguments=launcharg_sensor.items()
-    )
+        PythonLaunchDescriptionSource(sensor_launch_path),
+        launch_arguments=[
+            ("use_adis_imu", "true"),
+            ("use_wit_imu", "true"),
+            ("use_velodyne", "true"),
+            ("use_ublox", "false"),
+            ("use_hokuyo", "false"),
+            ("use_web_camera", "false"),
+            ("use_realsense_camera", "false"),
+            ("use_zed_camera", "false")
+        ]
+    )    
     # kuaro_whill Launch
     # Parameter YAML file: config/param/ros2_whill_params.yaml
     # Parameter YAML file: config/param/whill_joy2_params.yaml
     kuaro_whill_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('whill_navi2'),
-                'launch', 'include', 'kuaro_whill.launch.py'
-            )
-        )
+        PythonLaunchDescriptionSource(kuaro_whill_launch_path)
     )
     # tf2_static Launch
-    # Argument YAML file: config/launch_arg/tf2_static_launch_arg.yaml
     tf2_static_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('whill_navi2'),
-                'launch', 'include', 'tf2_static.launch.py'
-            )
-        ),
-        launch_arguments=launcharg_tf2_static.items()
+        PythonLaunchDescriptionSource(tf2_static_launch_path),
+        launch_arguments=[
+            ("hokuyo_frame", "laser_front"),
+            ("velodyne_frame", "velodyne"),
+            ("adis_imu_frame", "imu_adis"),
+            ("wit_imu_frame", "imu_wit"),
+            ("ublox_frame", "ublox"),
+            ("whill_frame", "base_link")
+        ]
     )
     
     # Node
@@ -116,49 +54,28 @@ def generate_launch_description():
     make_dir_node = Node(
         package='whill_navi2',
         executable='make_dir_node',
-        name='make_dir_node',
-        parameters=[paramspath_make_dir]
+        parameters=[mkdir_params_data]
     )
     # Parameter YAML file: config/param/ekf_node_params.yaml
     ekf_odometry_node = Node(
         package='robot_localization',
         executable='ekf_node',
         name='ekf_filter_node',
-        parameters=[
-            os.path.join(
-                get_package_share_directory('whill_navi2'),
-                'config', 'params', 'ekf_node_params.yaml'
-            )
-        ]
+        parameters=[ekf_params_data]
     )
     # Rviz config file: config/rviz2/data_gather_launch.rviz
     rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
         name='datagather_rviz2_node',
-        arguments=[
-            '-d',
-            os.path.join(
-                get_package_share_directory('whill_navi2'), 
-                'config', 'rviz2', 'data_gather_launch.rviz'
-            )
-        ]
+        arguments=['-d', rviz_path]
     )
     
     # Process
     ros2bag_record_process = ExecuteProcess(
         cmd=[
             FindExecutable(name='ros2'),
-            'bag', 'record', '--all', '-o', 
-            os.path.join(
-                os.environ['HOME'],
-                nodeparams_make_dir['ws_path'],
-                "full_data",
-                str(nodeparams_make_dir['date_path']),
-                nodeparams_make_dir['place_path'],
-                nodeparams_make_dir["bag_path"],
-                nodeparams_make_dir["bag_name"]
-            )
+            'bag', 'record', '--all', '-o', get_data_path().bag_path
         ]
     )
 

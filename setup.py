@@ -34,8 +34,6 @@ setup(
             glob(os.path.join('config', 'params', '*.yaml'))),
         (os.path.join(SHARE_DIR, 'config', 'rviz2'), 
             glob(os.path.join('config', 'rviz2', '*.rviz'))),
-        (os.path.join(SHARE_DIR, 'config', 'launch_arg'), 
-            glob(os.path.join('config', 'launch_arg', '*.yaml'))),
         (os.path.join(SHARE_DIR, 'config', 'urdf'), 
             glob(os.path.join('config', 'urdf', '*.urdf'))),       
         (os.path.join(SHARE_DIR, 'config', 'xacro'), 
@@ -50,7 +48,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'make_dir_node = whill_navi2.make_dir_node:main'
+            'make_dir_node = whill_navi2.make_dir_node:main',
+            'map2remap_node = whill_navi2.map2remap_node:main'
         ],
     },
 )

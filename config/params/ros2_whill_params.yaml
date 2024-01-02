@@ -10,3 +10,17 @@ whill/ros2_whill:
     publish_tf: false
     base_frame_id: "base_link"
     odom_frame_id: "odom"
+
+whill_joy2:
+  ros__parameters:
+    axis_liner: 1
+    axis_angular: 0
+    buttons_deadman: 5  
+    scale_angular: 0.8
+    scale_linear: 0.567
+    buttons_stop: 0
+    buttons_rotation_R: 5
+    buttons_rotation_L: 2
+    buttons_straight: 2
+    use_joycon: true
+    frequency: 10
