@@ -13,6 +13,6 @@ zed_f9p_node:
     port: /dev/ttyACM1
     baud: 230400
     use_rtk: true
-    rate: 20.0
+    rate: 20
     debug: false
     frame_id: ublox
