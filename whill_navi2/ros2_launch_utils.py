@@ -3,12 +3,18 @@ import os, sys, rclpy, shutil, ruamel.yaml, datetime
 # Ros Launch Modules
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction, GroupAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, \
+                            ExecuteProcess, RegisterEventHandler, LogInfo, \
+                            TimerAction, GroupAction, Shutdown, EmitEvent
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, FindExecutable
 from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown
+from launch.events import matches_action
 from launch.conditions import IfCondition
-from launch_ros.actions import Node
+from launch_ros.actions import Node, lifecycle_node, lifecycle_transition, LifecycleNode
+from launch_ros.events import lifecycle
+from launch_ros.event_handlers import OnStateTransition
+from lifecycle_msgs.msg import Transition
         
 # input: path of directory.
 # output: list of the directory names in the path

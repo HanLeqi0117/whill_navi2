@@ -38,7 +38,7 @@ def generate_launch_description():
     # Process Action
     bag_play_process = ExecuteProcess(
         cmd=[
-            "ros2", "bag", "play", "--rate 0.6", data_path.bag_path
+            "ros2", "bag", "play", data_path.bag_path, "--rate=0.6"
         ]
     )
     
@@ -58,7 +58,7 @@ def generate_launch_description():
     when_bag_over = RegisterEventHandler(
         OnExecutionComplete(
             target_action=bag_play_process,
-            on_start=[
+            on_completion=[
                 LogInfo(msg="MapSaver is starting..."),
                 TimerAction(
                     period=0.5,
@@ -70,11 +70,19 @@ def generate_launch_description():
     when_map_saver_over = RegisterEventHandler(
         OnExecutionComplete(
             target_action=map_saver_cli_node,
-            on_start=[
+            on_completion=[
                 TimerAction(
                     period=0.1,
                     actions=[cp_map2remap_node]
                 )
+            ]
+        )
+    )
+    when_cp_over = RegisterEventHandler(
+        OnExecutionComplete(
+            target_action=cp_map2remap_node,
+            on_completion=[
+                Shutdown()
             ]
         )
     )
@@ -83,7 +91,8 @@ def generate_launch_description():
         slam_offline_rviz2_node,
         when_slam_start,
         when_bag_over,
-        when_map_saver_over
+        when_map_saver_over,
+        when_cp_over
     ])
 
 

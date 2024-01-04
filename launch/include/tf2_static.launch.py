@@ -69,7 +69,7 @@ def generate_launch_description():
         # ]
         arguments = [
             '--x', '0.44', '--y', '-0.23', '--z', '0.2575', 
-            '--roll', '0.0', '--pitch', '0.0', '--yaw', '1.5707963', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '-1.5707963', 
             '--frame-id', whill_frame_arg.default_value[0].perform('tf2_static_launch'), 
             '--child-frame-id', wit_imu_frame_arg.default_value[0].perform('tf2_static_launch'), 
         ]           

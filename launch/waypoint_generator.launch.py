@@ -1,62 +1,38 @@
-import os
-import yaml
-
-from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.actions import (IncludeLaunchDescription, ExecuteProcess, 
-                            RegisterEventHandler, EmitEvent, TimerAction,
-                            GroupAction)
-from launch.event_handlers import OnProcessStart
-from launch.events import matches_action
-from launch_ros.events import lifecycle
-from lifecycle_msgs.msg import Transition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, FindExecutable
-from launch_ros.actions import Node, LifecycleNode
-from launch_ros.event_handlers import OnStateTransition
-
+from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
+
+    data_path = DataPath()
+    rviz_path = get_rviz_path("whill_navi2", "waypoint_maker.rviz")
     
-   # Path
-    with open(os.path.join(
-        get_package_share_directory('whill_navi2'),
-        'config', 'launch_arg', 'full_data_path_launch_arg.yaml'
-    )) as f:
-        launcharg_full_data_path = yaml.safe_load(f)['full_data_path_launch']   
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
     
     # Node
     waypoint_maker_node = Node(
         package="waypoint_pkg",
         executable="waypoint_maker",
         name='waypoint_maker',
-        parameters=[
-            os.path.join(
-                get_package_share_directory('whill_navi2'),
-                'conifg', 'params', 'waypoint_maker_params.yaml'
-            ),
-            {'way_txt_file': os.path.join(
-                launcharg_full_data_path['waypoint_path_abs'],
-                launcharg_full_data_path['waypoint_name'])}
-        ],
+        parameters=[{
+            'way_txt_file' : data_path.waypoint_path,
+            "point_distance" : 4.0,
+            "deg_thresh" : 15.0,
+            "deg_chord" : 1.0
+        }],
         output="screen"
     )
     ros2bag_play_process = ExecuteProcess(
         cmd=[
                 FindExecutable(name="ros2"),
-                'bag', 'play', os.path.join(
-                launcharg_full_data_path['bag_path_abs']
-            )
+                'bag', 'play', data_path.bag_path
         ]
     )
     waypoint_maker_rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
         name='waypoint_maker_rviz2',
-        arguments=['-d', os.path.join(
-            get_package_share_directory('whill_navi2'),
-            'config', 'rviz2', 'waypoint_maker_launch.rviz'
-        )]
+        arguments=['-d', rviz_path]
     )
     
     # Lifecycle Node
@@ -77,8 +53,8 @@ def generate_launch_description():
         package="waypoint_generator_launch",
         parameters=[{
             "yaml_filename": os.path.join(
-                launcharg_full_data_path["remap_path_abs"],
-                launcharg_full_data_path["remap_name"]
+                data_path.remap_dir,
+                data_path.remap_name + '.yaml'
             )
         }]
     )
