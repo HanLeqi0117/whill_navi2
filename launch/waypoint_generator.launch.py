@@ -4,6 +4,7 @@ def generate_launch_description():
 
     data_path = DataPath()
     rviz_path = get_rviz_path("whill_navi2", "waypoint_maker.rviz")
+    amcl_params_yaml_path = get_yaml_path("whill_navi2", "amcl_params.yaml")
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -41,10 +42,7 @@ def generate_launch_description():
         executable="amcl",
         name="amcl",
         namespace='waypoint_generator_launch',
-        parameters=[os.path.join(
-            get_package_share_directory("whill_navi2"),
-            'config', 'params', 'amcl_params.yaml'
-        )],
+        parameters=[amcl_params_yaml_path],
     )
     map_server_lifecycle_node = LifecycleNode(
         package="nav2_map_server",
