@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.8  # 0.2
     alpha4: 0.2
     alpha5: 0.2
-    always_reset_initial_pose: true  # false
+    always_reset_initial_pose: false  # false
     base_frame_id: base_link  # base_footprint(default)
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9

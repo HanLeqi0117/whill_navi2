@@ -1,118 +1,106 @@
 from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
-    
-    mkdir_params_data = get_node_params_dict("whill_navi2", 'make_dir_node_params.yaml', "make_dir_node")
-    ekf_params_data = get_node_params_dict("whill_navi2", "ekf_node_params.yaml", "ekf_filter_node")
-    sensor_launch_path = get_include_launch_path("whill_navi2", "sensor.launch.py")
-    kuaro_whill_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
-    tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
-    rviz_path = get_rviz_path("whill_navi2", "data_gather_launch.rviz")
-    
-    backup_bagfile()
+
+    data_path = DataPath()
+    rviz_path = get_rviz_path("whill_navi2", "waypoint_editor.rviz")
+    read_path, write_path = data_path.get_rewapypoint_path()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
-    
-    # Include Launch File
-    # sensor Launch
-    sensor_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(sensor_launch_path),
-        launch_arguments=[
-            ("use_adis_imu", "false"),
-            ("use_wit_imu", "false"),
-            ("use_velodyne", "false"),
-            ("use_ublox", "false"),
-            ("use_hokuyo", "false"),
-            ("use_web_camera", "false"),
-            ("use_realsense_camera", "false"),
-            ("use_zed_camera", "false")
-        ]
-    )    
-    # kuaro_whill Launch
-    # Parameter YAML file: config/param/ros2_whill_params.yaml
-    # Parameter YAML file: config/param/whill_joy2_params.yaml
-    kuaro_whill_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(kuaro_whill_launch_path)
-    )
-    # tf2_static Launch
-    tf2_static_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(tf2_static_launch_path),
-        launch_arguments=[
-            ("hokuyo_frame", "laser_front"),
-            ("velodyne_frame", "velodyne"),
-            ("adis_imu_frame", "imu_adis"),
-            ("wit_imu_frame", "imu_wit"),
-            ("ublox_frame", "ublox"),
-            ("whill_frame", "base_link")
-        ]
-    )
-    
-    # Node
-    # Parameter YAML file: config/param/make_dir_node_params.yaml
-    make_dir_node = Node(
-        package='whill_navi2',
-        executable='make_dir_node',
-        parameters=[mkdir_params_data]
-    )
-    # Parameter YAML file: config/param/ekf_node_params.yaml
-    ekf_odometry_node = Node(
-        package='robot_localization',
-        executable='ekf_node',
-        name='ekf_filter_node',
-        parameters=[ekf_params_data]
-    )
-    # Rviz config file: config/rviz2/data_gather_launch.rviz
-    rviz2_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='datagather_rviz2_node',
-        arguments=['-d', rviz_path]
-    )
-    
-    # Process
-    ros2bag_record_process = ExecuteProcess(
-        cmd=[
-            FindExecutable(name='ros2'),
-            'bag', 'record', '--all', '-o', get_data_path().bag_path
-        ]
-    )
 
-    ## Group
-    # Launch
-    launch_group = GroupAction(actions=[
-        sensor_launch,
-        kuaro_whill_launch,
-        tf2_static_launch
-    ])
-    # Node
-    node_group = GroupAction(actions=[
-        make_dir_node,
-        ekf_odometry_node,
-        rviz2_node
-    ])
-    # Action
-    action_group = GroupAction(actions=[
-        node_group,
-        launch_group
-    ])
 
-    # Event
-    ros2bag_record_event = RegisterEventHandler(
+    # Node
+    waypoint_editor_rviz2_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="waypoint_editor_rviz2",
+        arguments=["-d", rviz_path],
+        output="screen"
+    )
+    waypoint_editor_node = Node(
+        package="waypoint_pkg",
+        executable="waypoint_editor",
+        name="waypoint_editor",
+        parameters=[{
+            "read_file_name": read_path,
+            "write_file_name": write_path,
+            "save_service_name": "save_service",
+            "update_service_name": "update_service",
+            "debug": False    
+        }],
+        output="screen"
+    ) 
+    # Lifecycle Node
+    map_server_lifecycle_node = LifecycleNode(
+        package="nav2_map_server",
+        executable="map_server",
+        name="map_server",
+        namespace="",
+        parameters=[{
+            "yaml_filename": os.path.join(
+                data_path.remap_dir,
+                data_path.remap_name + '.yaml'
+            )
+        }],
+        output="screen"
+    )
+    
+    # When rviz is launched, change map_server to configured
+    when_rviz_launched = RegisterEventHandler(
         OnProcessStart(
-            target_action=make_dir_node,
+            target_action=waypoint_editor_rviz2_node,
             on_start=[
-                LogInfo(msg='Sensors are launched, and then start to record the data.'),
+                EmitEvent(
+                    event=lifecycle.ChangeState(
+                        lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
+                        transition_id=Transition.TRANSITION_CONFIGURE
+                    )
+                ),
                 TimerAction(
-                    actions=[ros2bag_record_process],
-                    period=0.5
+                    actions=[waypoint_editor_node],
+                    period=0.1
                 )
             ]
         )
     )
-
-    return LaunchDescription([   
-        action_group, 
-        ros2bag_record_event
+    # When map_server is configured, activate ifself
+    when_mapserver_configured = RegisterEventHandler(
+        OnStateTransition(
+            target_lifecycle_node=map_server_lifecycle_node,
+            # start_state="configuring",
+            # goal_state="inactive",
+            transition=Transition(id=Transition.TRANSITION_ACTIVATE).label,
+            entities=[
+                EmitEvent(
+                    event=lifecycle.ChangeState(
+                        lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
+                        transition_id=Transition.TRANSITION_ACTIVATE
+                    )
+                )
+            ]
+        )
+    )
+    # When rviz exit, shutdown RosLaunch
+    when_rviz_over = RegisterEventHandler(
+        OnExecutionComplete(
+            target_action=waypoint_editor_rviz2_node,
+            on_completion=[
+                Shutdown()
+            ]
+        )
+    )
+    action_group = GroupAction(
+        actions=[
+            when_rviz_launched,
+            when_mapserver_configured,
+            when_rviz_over
+        ]
+    )
+    
+    return LaunchDescription([        
+        waypoint_editor_rviz2_node,
+        map_server_lifecycle_node,
+        action_group
     ])

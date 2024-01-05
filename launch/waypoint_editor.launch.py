@@ -1,61 +1,22 @@
-import os
-import yaml
-
-from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler, Shutdown, EmitEvent
-from launch.event_handlers import OnProcessStart, OnProcessExit
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
-from launch.events import matches_action
-from launch_ros.events import lifecycle
-from launch_ros.event_handlers import OnStateTransition
-from launch_ros.actions import Node, LifecycleNode
-from lifecycle_msgs.msg import Transition
-
-# input: path of directory.
-# output: list of the flie names in the path
-def list_files_in_directory(path):
-    file_list = []
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            file_list.append(file)
-    return sorted(file_list)
+from whill_navi2.ros2_launch_utils import *
 
 def generate_launch_description():
-    
-    with open(os.path.join(
-        get_package_share_directory("whill_navi2"),
-        "config", "launch_arg", "full_data_path_launch_arg.yaml"
-    )) as f:
-        launcharg_full_data_path = yaml.safe_load(f)["full_data_path_launch"]
 
-    file_names = list_files_in_directory(launcharg_full_data_path["rewaypoint_path_abs"])
-    read_file_path = launcharg_full_data_path["waypoint_path_abs"]
-    write_file_path = launcharg_full_data_path["rewaypoint_path_abs"]
-    read_file_name = launcharg_full_data_path["waypoint_name"]
-    write_file_name = launcharg_full_data_path["rewaypoint_name"]
-    for file_name in file_names:
-        if file_names.count() == 0:
-            read_file_path = launcharg_full_data_path["waypoint_path_abs"]
-            write_file_path = launcharg_full_data_path["rewaypoint_path_abs"]
-            read_file_name = launcharg_full_data_path["waypoint_name"]
-            write_file_name = launcharg_full_data_path["rewaypoint_name"]
-        else:
-            read_file_path = launcharg_full_data_path["rewaypoint_path_abs"]
-            write_file_path = read_file_path = launcharg_full_data_path["rewaypoint_path_abs"]
-            read_file_name = file_names[-1]
-            write_file_name = str(file_names.count()) + launcharg_full_data_path["rewaypoint_name"]
+    data_path = DataPath()
+    rviz_path = get_rviz_path("whill_navi2", "waypoint_editor.rviz")
+    read_path, write_path = data_path.get_rewapypoint_path()
+    
+##############################################################################################
+####################################### ROS LAUNCH API #######################################
+##############################################################################################
+
 
     # Node
     waypoint_editor_rviz2_node = Node(
         package="rviz2",
         executable="rviz2",
         name="waypoint_editor_rviz2",
-        arguments=["-f", os.path.join(
-            get_package_share_directory("whill_navi2"),
-            "config", "rviz2", "waypoint_editor_launch.rviz"
-        )],
+        arguments=["-d", rviz_path],
         output="screen"
     )
     waypoint_editor_node = Node(
@@ -63,33 +24,31 @@ def generate_launch_description():
         executable="waypoint_editor",
         name="waypoint_editor",
         parameters=[{
-            "read_file_name": os.path.join(
-                read_file_path, read_file_name
-            ),
-            "write_file_name": os.path.join(
-                write_file_path, write_file_name
-            )
+            "read_file_name": read_path,
+            "write_file_name": write_path,
+            "save_service_name": "save_service",
+            "update_service_name": "update_service",
+            "debug": False    
         }],
         output="screen"
-    )
-    
+    ) 
     # Lifecycle Node
     map_server_lifecycle_node = LifecycleNode(
         package="nav2_map_server",
         executable="map_server",
         name="map_server",
-        namespace="waypoint_editor_launch",
+        namespace="",
         parameters=[{
             "yaml_filename": os.path.join(
-                launcharg_full_data_path["remap_path_abs"],
-                launcharg_full_data_path["remap_name"]
+                data_path.remap_dir,
+                data_path.remap_name + '.yaml'
             )
         }],
         output="screen"
     )
     
-    # Event
-    map_server_lifecycle_node_configure_event = RegisterEventHandler(
+    # When rviz is launched, change map_server to configured
+    when_rviz_launched = RegisterEventHandler(
         OnProcessStart(
             target_action=waypoint_editor_rviz2_node,
             on_start=[
@@ -98,35 +57,49 @@ def generate_launch_description():
                         lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
                         transition_id=Transition.TRANSITION_CONFIGURE
                     )
+                ),
+                TimerAction(
+                    actions=[waypoint_editor_node],
+                    period=0.1
                 )
             ]
         )
     )
-    map_server_lifecycle_node_activate_event = RegisterEventHandler(
+    # When map_server is configured, activate ifself
+    when_mapserver_configured = RegisterEventHandler(
         OnStateTransition(
             target_lifecycle_node=map_server_lifecycle_node,
+            start_state="configuring",
+            goal_state="inactive",
             entities=[
                 EmitEvent(
                     event=lifecycle.ChangeState(
                         lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
                         transition_id=Transition.TRANSITION_ACTIVATE
                     )
-                ),
-                waypoint_editor_node
+                )
             ]
         )
     )
-    shutdown_launch_event = RegisterEventHandler(
-        OnProcessExit(
+    # When rviz exit, shutdown RosLaunch
+    when_rviz_over = RegisterEventHandler(
+        OnExecutionComplete(
             target_action=waypoint_editor_rviz2_node,
-            on_exit=[Shutdown()]
+            on_completion=[
+                Shutdown()
+            ]
         )
+    )
+    action_group = GroupAction(
+        actions=[
+            when_rviz_launched,
+            when_mapserver_configured,
+            when_rviz_over
+        ]
     )
     
     return LaunchDescription([        
         waypoint_editor_rviz2_node,
         map_server_lifecycle_node,
-        map_server_lifecycle_node_configure_event,
-        map_server_lifecycle_node_activate_event,
-        shutdown_launch_event
+        action_group
     ])

@@ -8,7 +8,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, \
                             TimerAction, GroupAction, Shutdown, EmitEvent
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, FindExecutable
-from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown
+from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown, OnProcessExit
 from launch.events import matches_action
 from launch.conditions import IfCondition
 from launch_ros.actions import Node, lifecycle_node, lifecycle_transition, LifecycleNode
@@ -18,12 +18,21 @@ from lifecycle_msgs.msg import Transition
         
 # input: path of directory.
 # output: list of the directory names in the path
-def list_files_in_directory(path=str):
+def list_dirs_in_directory(path=str):
     dir_list = []
     for root, dirs, files in os.walk(path):
         for dir in dirs:
             dir_list.append(dir)
     return sorted(dir_list)
+
+# input: path of directory.
+# output: list of the directory names in the path
+def list_files_in_directory(path=str):
+    file_list = []
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            file_list.append(dir)
+    return sorted(file_list)
 
 # input: package_name and yaml_file_name
 # output: the dictionary of parameters
@@ -92,7 +101,7 @@ class DataPath:
 
     def backup_bagfile(self):
         if os.path.exists(self.bag_dir):
-            bag_name_list = list_files_in_directory(self.bag_dir)
+            bag_name_list = list_dirs_in_directory(self.bag_dir)
             if len(bag_name_list) > 0:
                 for bag_name in bag_name_list:
                     if bag_name == bag_name:
@@ -108,4 +117,16 @@ class DataPath:
                                 os.path.join(self.bag_dir, bag_name),
                                 os.path.join(self.backup_bag_dir, backup_bag_file)
                             )
-
+                            
+    def get_rewapypoint_path(self):
+        paths = list_files_in_directory(self.rewaypoint_dir)
+        if len(paths) == 0:
+            read_path = self.waypoint_path
+            write_path = os.path.join(self.rewaypoint_dir, '1_' + self.rewaypoint_name)
+        else:
+            path_num = len(paths)
+            read_path = os.path.join(self.rewaypoint_dir, str(path_num) + '_' + self.rewaypoint_name)
+            write_path = os.path.join(self.rewaypoint_dir, str(path_num + 1) + '_' + self.rewaypoint_name)
+        
+        return [read_path, write_path]
+                
