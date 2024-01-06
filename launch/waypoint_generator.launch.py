@@ -21,6 +21,7 @@ def generate_launch_description():
             "deg_thresh" : 15.0,
             "deg_chord" : 1.0
         }],
+        arguments=['--ros-args', '--log-level', 'info'],
         output="screen"
     )
     ros2bag_play_process = ExecuteProcess(
@@ -56,59 +57,58 @@ def generate_launch_description():
             )
         }]
     )
+    lifecycle_manager_node = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        parameters=[{
+            'autostart' : True,
+            'node_names' : ['amcl', 'map_server']
+        }]
+    )    
 
-    # When rviz is launched, configure the amcl and map_server
+    # When rviz is launched, launch the lifecycle_manager to start the lifecycle_nodes automatically
     when_rviz_launched = RegisterEventHandler(
         OnProcessStart(
             target_action=waypoint_maker_rviz2_node,
             on_start=[
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(amcl_lifecycle_node),
-                        transition_id=Transition.TRANSITION_CONFIGURE
-                    )
-                ),
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
-                        transition_id=Transition.TRANSITION_CONFIGURE
-                    )
-                )                
+                lifecycle_manager_node,
+                amcl_lifecycle_node,
+                map_server_lifecycle_node
             ]
         )
     )
-    # When amcl is configured, activate itself
-    when_amcl_configured = RegisterEventHandler(
-        OnStateTransition(
-            target_lifecycle_node=amcl_lifecycle_node,
-            start_state="configuring",
-            goal_state="inactive",
-            entities=[
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(amcl_lifecycle_node),
-                        transition_id=Transition.TRANSITION_ACTIVATE
-                    )
-                )
-            ]
-        )
-    )
-    # When map_server is configured, activate itself
-    when_mapserver_configured = RegisterEventHandler(
-        OnStateTransition(
-            target_lifecycle_node=map_server_lifecycle_node,
-            start_state="configuring",
-            goal_state="inactive",            
-            entities=[
-                EmitEvent(
-                    event=lifecycle.ChangeState(
-                        lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
-                        transition_id=Transition.TRANSITION_ACTIVATE
-                    )
-                )
-            ]
-        )
-    )
+    # # When amcl is configured, activate itself
+    # when_amcl_configured = RegisterEventHandler(
+    #     OnStateTransition(
+    #         target_lifecycle_node=amcl_lifecycle_node,
+    #         start_state="configuring",
+    #         goal_state="inactive",
+    #         entities=[
+    #             EmitEvent(
+    #                 event=lifecycle.ChangeState(
+    #                     lifecycle_node_matcher=matches_action(amcl_lifecycle_node),
+    #                     transition_id=Transition.TRANSITION_ACTIVATE
+    #                 )
+    #             )
+    #         ]
+    #     )
+    # )
+    # # When map_server is configured, activate itself
+    # when_mapserver_configured = RegisterEventHandler(
+    #     OnStateTransition(
+    #         target_lifecycle_node=map_server_lifecycle_node,
+    #         start_state="configuring",
+    #         goal_state="inactive",            
+    #         entities=[
+    #             EmitEvent(
+    #                 event=lifecycle.ChangeState(
+    #                     lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
+    #                     transition_id=Transition.TRANSITION_ACTIVATE
+    #                 )
+    #             )
+    #         ]
+    #     )
+    # )
     # When waypoint_maker is launched, launch ros2bag in 0.5s
     when_waypoint_maker_launched = RegisterEventHandler(
         OnProcessStart(
@@ -116,7 +116,7 @@ def generate_launch_description():
             on_start=[
                 TimerAction(
                     actions=[ros2bag_play_process],
-                    period=0.5
+                    period=2.0
                 )
             ]
         )
@@ -137,18 +137,18 @@ def generate_launch_description():
     action_group = GroupAction(
         actions=[
             when_rviz_launched,
-            when_amcl_configured,
-            when_mapserver_configured,
             waypoint_maker_node,
             when_waypoint_maker_launched,
+            # when_amcl_configured,
+            # when_mapserver_configured,
             when_ros2bag_over
         ]
     )
     
     return LaunchDescription([
         waypoint_maker_rviz2_node,
-        amcl_lifecycle_node,
-        map_server_lifecycle_node,
+        # amcl_lifecycle_node,
+        # map_server_lifecycle_node,
         action_group        
     ])
 

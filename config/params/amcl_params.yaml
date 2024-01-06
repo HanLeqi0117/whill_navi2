@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.8  # 0.2
     alpha4: 0.2
     alpha5: 0.2
-    always_reset_initial_pose: false  # false
+    always_reset_initial_pose: true  # false(default)
     base_frame_id: base_link  # base_footprint(default)
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
@@ -21,12 +21,12 @@ amcl:
       z: 0.0
     lambda_short: 0.1
     laser_likelihood_max_dist: 2.0
-    laser_max_range: 100.0
+    laser_max_range: 120.0  # 100.0(default)
     laser_min_range: -1.0
     laser_model_type: likelihood_field
     map_topic: map
-    max_beams: 30  # 60
-    max_particles: 4000  # 2000
+    max_beams: 30  # 60(default)
+    max_particles: 4000  # 2000(default)
     min_particles: 500
     odom_frame_id: odom
     pf_err: 0.05
@@ -37,7 +37,7 @@ amcl:
     robot_model_type: nav2_amcl::DifferentialMotionModel
     save_pose_rate: 0.5
     scan_topic: scan
-    set_initial_pose: true  # false
+    set_initial_pose: true  # false(default)
     sigma_hit: 0.2
     tf_broadcast: true
     transform_tolerance: 0.1  # 1.0

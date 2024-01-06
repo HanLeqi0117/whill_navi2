@@ -7,10 +7,10 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, \
                             ExecuteProcess, RegisterEventHandler, LogInfo, \
                             TimerAction, GroupAction, Shutdown, EmitEvent
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, FindExecutable
+from launch.substitutions import LaunchConfiguration, FindExecutable, EqualsSubstitution, NotEqualsSubstitution
 from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown, OnProcessExit
 from launch.events import matches_action
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node, lifecycle_node, lifecycle_transition, LifecycleNode
 from launch_ros.events import lifecycle
 from launch_ros.event_handlers import OnStateTransition
