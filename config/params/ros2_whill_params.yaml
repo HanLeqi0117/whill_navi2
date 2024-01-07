@@ -26,3 +26,4 @@ whill_joy2:
     use_joycon: true
     frequency: 10
     speed_mode: 3
+    pressed_duration: 2.0

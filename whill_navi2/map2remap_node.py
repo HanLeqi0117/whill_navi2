@@ -1,7 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from whill_navi2.ros2_launch_utils import shutil, os, ruamel, DataPath
-
+from whill_navi2.whill_navi2.modules.ros2_launch_utils import shutil, os, ruamel, DataPath
 
 class Map2RemapNode(Node):
 

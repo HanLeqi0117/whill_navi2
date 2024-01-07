@@ -1,7 +1,7 @@
 import os, sys, rclpy, shutil, ruamel.yaml, datetime
 
 # Ros Launch Modules
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import *
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, \
                             ExecuteProcess, RegisterEventHandler, LogInfo, \
@@ -23,7 +23,7 @@ def list_dirs_in_directory(path=str):
     for root, dirs, files in os.walk(path):
         for dir in dirs:
             dir_list.append(dir)
-    return sorted(dir_list)
+    return dir_list
 
 # input: path of directory.
 # output: list of the directory names in the path
@@ -32,7 +32,7 @@ def list_files_in_directory(path=str):
     for root, dirs, files in os.walk(path):
         for file in files:
             file_list.append(dir)
-    return sorted(file_list)
+    return file_list
 
 # input: package_name and yaml_file_name
 # output: the dictionary of parameters

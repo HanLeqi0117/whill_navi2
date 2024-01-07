@@ -49,7 +49,8 @@ setup(
     entry_points={
         'console_scripts': [
             'make_dir_node = whill_navi2.make_dir_node:main',
-            'map2remap_node = whill_navi2.map2remap_node:main'
+            'map2remap_node = whill_navi2.map2remap_node:main',
+            'whill_navi2_node = whill_navi2.whill_navi2_node:main',
         ],
     },
 )

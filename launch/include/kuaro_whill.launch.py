@@ -1,4 +1,4 @@
-from whill_navi2.ros2_launch_utils import *
+from whill_navi2.modules.ros2_launch_utils import *
 
 def generate_launch_description():
     
@@ -59,7 +59,9 @@ def generate_launch_description():
         remappings=[
             ('joy_state', 'joy'),
             ('controller/joy', 'whill/controller/joy'),
-            ('controller/cmd_vel', 'vel_to_joy/cmd_vel')
+            ('controller/cmd_vel', 'vel_to_joy/cmd_vel'),
+            ('speed_profile', 'whill/speed'),
+            ('set_speed_profile_srv', 'whill/set_speed_profile_srv')
         ]
     )
     

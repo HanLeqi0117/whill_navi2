@@ -1,4 +1,4 @@
-from whill_navi2.ros2_launch_utils import *
+from whill_navi2.modules.ros2_launch_utils import *
 
 def generate_launch_description():
     
