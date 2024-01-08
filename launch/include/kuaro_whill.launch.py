@@ -60,7 +60,7 @@ def generate_launch_description():
             ('joy_state', 'joy'),
             ('controller/joy', 'whill/controller/joy'),
             ('controller/cmd_vel', 'vel_to_joy/cmd_vel'),
-            ('speed_profile', 'whill/speed'),
+            ('speed_profile', 'whill/speed_profile'),
             ('set_speed_profile_srv', 'whill/set_speed_profile_srv')
         ]
     )
