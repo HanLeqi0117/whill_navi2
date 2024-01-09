@@ -23,7 +23,24 @@ whill_joy2:
     buttons_rotation_R: 5
     buttons_rotation_L: 2
     buttons_straight: 2
+    # if true, permissible to use joystick to control
     use_joycon: true
+    # main process rate
     frequency: 10
-    speed_mode: 3
+    # the duration between the time when LB and RB is pressed
     pressed_duration: 2.0
+    # Sequentially, front: speed, acceleration, deceleration / back: speed, acceleration, deceleration / turn: speed, acceleration, deceleration
+    # speed m/s acceleration m/ss deceleration m/ss
+    # Speed limit: 8 ~ 60
+    # Acceleration limit: 10 ~ 90
+    # Deceleration limit: 10 ~ 160
+    speed_profie_config: [
+      10, 16, 48, 10, 16, 40, 8, 56, 72
+      15, 16, 64, 10, 16, 56, 10, 56, 72,
+      30, 16, 82, 20, 16, 64, 15, 56, 72,
+      45, 16, 90, 20, 24, 64, 18, 56, 72,
+      57, 16, 90, 20, 24, 64, 14, 28, 64,
+      15, 16, 64, 10, 16, 56, 10, 56, 72
+    ]
+    # default speed mode. limit: 0 ~ 6
+    speed_mode: 3
