@@ -1,0 +1,135 @@
+capture_directory: "~"
+fixed_frame: map
+target_frame: map
+fix_orientation: false
+rotate_90: false
+enable_antialiasing: true
+show_displays: true
+show_status_bar: true
+show_capture_tools: true
+window_width: 960
+window_height: 894
+view_scale: 0.276183993
+offset_x: 51.3192291
+offset_y: -1.24216652
+use_latest_transforms: true
+background: "#a0a0a4"
+image_transport: raw
+displays:
+  - type: mapviz_plugins/tile_map
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      custom_sources:
+        []
+      bing_api_key: AjUIFVHQqwaefdwfh3-uLRJViDFU8O798TvavTQtk4nDfDvtAn_Fc18EWXkDB4M2
+      source: Bing Maps (terrain)
+  - type: mapviz_plugins/point_click_publisher
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: clicked_point
+      output_frame: wgs84
+  - type: mapviz_plugins/tf_frame
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      frame: base_link
+      color: "#00ff00"
+      draw_style: arrows
+      position_tolerance: 0
+      buffer_size: 1
+      static_arrow_sizes: true
+      arrow_size: 56
+  - type: mapviz_plugins/navsat
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: ublox/fix
+      color: "#55ffff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 10000
+  - type: mapviz_plugins/odometry
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /odometry/filtered/global
+      color: "#00ff00"
+      draw_style: points
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 1
+      show_timestamps: 0
+  - type: mapviz_plugins/odometry
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /odometry/gps
+      color: "#ffff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 10000000
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+  - type: mapviz_plugins/odometry
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /odometry/filtered/local
+      color: "#5500ff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 10000000
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+  - type: mapviz_plugins/odometry
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /odometry/filtered/local
+      color: "#ff0000"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 10000000
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+  - type: mapviz_plugins/laserscan
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /scan
+      size: 3
+      buffer_size: 6000
+      alpha: 1
+      color_transformer: Flat Color
+      min_color: "#ffffff"
+      max_color: "#000000"
+      value_min: 0
+      value_max: 100
+      use_rainbow: false

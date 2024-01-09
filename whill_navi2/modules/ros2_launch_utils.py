@@ -66,6 +66,11 @@ def get_rviz_path(package_name = str, rviz_filename = str):
         "config", "rviz2", rviz_filename
     )
 
+def get_rviz_path(package_name = str, mapviz_filename = str):
+    return os.path.join(
+        get_package_share_directory(package_name),
+        "config", "mapviz", mapviz_filename
+    )
 
 class DataPath:
     

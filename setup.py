@@ -37,7 +37,9 @@ setup(
         (os.path.join(SHARE_DIR, 'config', 'urdf'), 
             glob(os.path.join('config', 'urdf', '*.urdf'))),       
         (os.path.join(SHARE_DIR, 'config', 'xacro'), 
-            glob(os.path.join('config', 'xacro', '*.xacro')))        
+            glob(os.path.join('config', 'xacro', '*.xacro'))),
+        (os.path.join(SHARE_DIR, 'config', 'mapviz'), 
+            glob(os.path.join('config', 'mapviz', '*.mvc')))                 
     ],
     install_requires=['setuptools'],
     zip_safe=True,
