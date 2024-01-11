@@ -2,7 +2,7 @@ from whill_navi2.modules.ros2_launch_utils import *
 
 def generate_launch_description():
     
-    wt901_params_yaml_path = get_yaml_path("whill_navi2", "wt901.yaml")
+    wt901_params_yaml_path = get_yaml_path("whill_navi2", "wt901_params.yaml")
     
     ld = LaunchDescription()
         

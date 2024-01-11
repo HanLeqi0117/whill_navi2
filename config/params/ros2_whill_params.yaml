@@ -3,13 +3,13 @@
 #
 whill/ros2_whill:
   ros__parameters:
-    serialport: "/dev/ttyUSB0"
+    serial_port: /dev/ttyUSB0
     wheel_radius: 0.135
     send_interval: 20
     enable_cmd_vel_control: false
     publish_tf: false
-    base_frame_id: "base_link"
-    odom_frame_id: "odom"
+    base_frame_id: base_link
+    odom_frame_id: odom
 
 whill_joy2:
   ros__parameters:
@@ -27,7 +27,7 @@ whill_joy2:
     # main process rate
     frequency: 10
     # the duration between the time when LB and RB is pressed
-    pressed_duration: 5.0
+    pressed_duration: 2.0
     # Sequentially, front(0 ~ 2): speed, acceleration, deceleration / back(3 ~ 5): speed, acceleration, deceleration / turn(6 ~ 8): speed, acceleration, deceleration
     # speed rad/s acceleration rad/ss deceleration rad/ss (Motor)
     # whill speed = motor speed * the radius(default: 0.1325m) of tire

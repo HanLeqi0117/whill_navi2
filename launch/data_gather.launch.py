@@ -3,7 +3,7 @@ from whill_navi2.modules.ros2_launch_utils import *
 def generate_launch_description():
     
     mkdir_params_yaml_path = get_yaml_path("whill_navi2", "make_dir_node_params.yaml")
-    ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_filter_node.yaml")
+    ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_node_params.yaml")
     sensor_launch_path = get_include_launch_path("whill_navi2", "sensor.launch.py")
     kuaro_whill_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
     tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
@@ -55,7 +55,7 @@ def generate_launch_description():
         package='whill_navi2',
         executable='make_dir_node',
         parameters=[mkdir_params_yaml_path]
-    )
+    )   
     # Parameter YAML file: config/param/ekf_node_params.yaml
     ekf_odometry_node = Node(
         package='robot_localization',
