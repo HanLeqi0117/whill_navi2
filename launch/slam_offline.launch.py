@@ -19,7 +19,7 @@ def generate_launch_description():
     slam_offline_node = Node(
         package='slam_toolbox',
         executable='sync_slam_toolbox_node',    
-        name='slam_toolbox',
+        name='slam_toolbox_offline',
         parameters=[slam_params_yaml_path],
         output='screen'
     )

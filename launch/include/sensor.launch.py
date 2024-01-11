@@ -8,7 +8,6 @@ def generate_launch_description():
     urg_node_launch_path = get_include_launch_path("whill_navi2", 'urg_node2.launch.py')
     web_camera_launch_path = get_include_launch_path("whill_navi2", 'web_camera.launch.py')
     velodyne_launch_path = get_include_launch_path("whill_navi2", 'velodyne-all-nodes-VLP16-launch.py')
-    wit_imu_launch_path = get_include_launch_path("whill_navi2", 'zed_f9p.launch.py')
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################

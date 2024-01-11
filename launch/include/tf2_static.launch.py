@@ -85,7 +85,19 @@ def generate_launch_description():
             '--child-frame-id', ublox_frame_arg.default_value[0].perform('tf2_static_launch'), 
         ]
     )
-    
+    tf2_static_origin_node = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="origin_to_map",
+        arguments = [
+            '--x', '0.0', '--y', '0.0', '--z', '0.0', 
+            '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', 
+            '--frame-id', "map", 
+            '--child-frame-id', "origin",             
+        ]
+    )
+
+
     return LaunchDescription([
         hokuyo_frame_arg,
         velodyne_frame_arg,
@@ -97,5 +109,6 @@ def generate_launch_description():
         tf2_static_velodyne_node,
         tf2_static_adis_imu_node,
         tf2_static_wit_imu_node,
-        tf2_static_gnss_node
-    ])
+        tf2_static_gnss_node,
+        tf2_static_origin_node
+])

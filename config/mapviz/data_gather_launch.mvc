@@ -9,7 +9,7 @@ show_status_bar: true
 show_capture_tools: true
 window_width: 960
 window_height: 894
-view_scale: 0.276183993
+view_scale: 20.0  # 0.276183993
 offset_x: 51.3192291
 offset_y: -1.24216652
 use_latest_transforms: true
