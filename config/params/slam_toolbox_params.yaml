@@ -79,7 +79,7 @@ slam_toolbox_online:
 
     # ROS Parameters
     odom_frame: odom
-    map_frame: slam_map
+    map_frame: map_slam
     base_frame: base_link
     scan_topic: scan
     use_map_saver: true
