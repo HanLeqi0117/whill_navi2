@@ -1,4 +1,4 @@
-witmotion_ros_node:
+witmotion:
   ros__parameters:
     port: /dev/ttyUSB1
     baud_rate: 115200  # baud

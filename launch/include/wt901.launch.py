@@ -9,6 +9,7 @@ def generate_launch_description():
     wit901_node=Node(
         package = 'witmotion_ros',
         executable = 'witmotion_ros_node',
+        name="witmotion",
         parameters = [wt901_params_yaml_path]
     )
     # IMUのデータフィルタを起動する
