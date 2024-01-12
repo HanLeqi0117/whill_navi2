@@ -8,7 +8,7 @@ Panels:
         - /Status1
         - /Marker1/Topic1
       Splitter Ratio: 0.5382353067398071
-    Tree Height: 555
+    Tree Height: 603
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -26,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Visualization Manager:
   Class: ""
   Displays:
@@ -110,20 +110,73 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base_floor:
+          Value: true
+        base_footprint:
+          Value: true
+        base_link:
+          Value: true
+        footrest_link:
+          Value: true
+        frontwheel_left:
+          Value: true
+        frontwheel_right:
+          Value: true
+        imu:
+          Value: true
+        imu_adis:
+          Value: true
+        imu_wit:
+          Value: true
+        laser_front:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
+        origin:
+          Value: true
+        ublox:
+          Value: true
+        velodyne:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          odom:
+            base_link:
+              base_floor:
+                footrest_link:
+                  {}
+                frontwheel_left:
+                  {}
+                frontwheel_right:
+                  {}
+              imu:
+                {}
+              imu_adis:
+                {}
+              imu_wit:
+                {}
+              laser_front:
+                {}
+              ublox:
+                {}
+              velodyne:
+                {}
+          origin:
+            {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/Marker
       Enabled: true
       Name: Marker
       Namespaces:
-        {}
+        marker_points: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -151,7 +204,7 @@ Visualization Manager:
           Color: 204; 51; 204
           Scale: 1
           Value: true
-        Value: true
+        Value: false
       Enabled: true
       Head Length: 0.30000001192092896
       Head Radius: 0.10000000149011612
@@ -213,7 +266,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 10.820979118347168
+      Distance: 17.623416900634766
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

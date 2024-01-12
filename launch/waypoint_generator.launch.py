@@ -18,8 +18,8 @@ def generate_launch_description():
         parameters=[{
             'way_txt_file' : data_path.waypoint_path,
             "point_distance" : 4.0,
-            "deg_thresh" : 15.0,
-            "deg_chord" : 1.0
+            "deg_thresh" : 5.0,
+            "deg_chord" : 0.5
         }],
         arguments=['--ros-args', '--log-level', 'info'],
         output="screen"
@@ -27,7 +27,7 @@ def generate_launch_description():
     ros2bag_play_process = ExecuteProcess(
         cmd=[
                 FindExecutable(name="ros2"),
-                'bag', 'play', data_path.bag_path, '--rate=0.6'
+                'bag', 'play', data_path.bag_path, '--rate=0.5'
         ]
     )
     waypoint_maker_rviz2_node = Node(
@@ -38,18 +38,14 @@ def generate_launch_description():
     )
     
     # Lifecycle Node
-    amcl_lifecycle_node = LifecycleNode(
+    amcl_lifecycle_node = Node(
         package="nav2_amcl",
         executable="amcl",
-        name='amcl',
-        namespace='',
         parameters=[amcl_params_yaml_path],
     )
-    map_server_lifecycle_node = LifecycleNode(
+    map_server_lifecycle_node = Node(
         package="nav2_map_server",
         executable="map_server",
-        name="map_server",
-        namespace='',
         parameters=[{
             "yaml_filename": os.path.join(
                 data_path.remap_dir,

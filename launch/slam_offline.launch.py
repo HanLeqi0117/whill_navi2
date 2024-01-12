@@ -38,7 +38,7 @@ def generate_launch_description():
     # Process Action
     bag_play_process = ExecuteProcess(
         cmd=[
-            "ros2", "bag", "play", data_path.bag_path, "--rate=0.6"
+            "ros2", "bag", "play", data_path.bag_path, "--rate=0.5"
         ]
     )
     

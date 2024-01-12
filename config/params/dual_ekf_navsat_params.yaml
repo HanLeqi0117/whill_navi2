@@ -32,10 +32,10 @@ ekf_filter_node_local:
                   true,  true,  true,
                   false, false, false,
                   false, false, false,
-                  false,  false, false]
+                  true,  false, false]
     imu0_differential: false
     imu0_relative: false
-    imu0_queue_size: 10
+    imu0_queue_size: 100
     imu0_remove_gravitational_acceleration: true
 
     # wt901
@@ -44,7 +44,7 @@ ekf_filter_node_local:
                   true, true, true,
                   false, false, false,
                   false, false, false,
-                  false, false, false]
+                  true, false, false]
     imu1_differential: false
     imu1_relative: false
     imu1_queue_size: 10
@@ -99,10 +99,10 @@ ekf_filter_node_global:
                   true, true, true,
                   false, false, false,
                   false, false, false,
-                  false, false, false]
+                  true, false, false]
     imu0_differential: false
     imu0_relative: false
-    imu0_queue_size: 10
+    imu0_queue_size: 100
     imu0_remove_gravitational_acceleration: true
 
     # wt901
@@ -111,7 +111,7 @@ ekf_filter_node_global:
                   true, true, true,
                   false, false, false,
                   false, false, false,
-                  false, false, false]
+                  true, false, false]
     imu1_differential: false
     imu1_relative: false
     imu1_queue_size: 10

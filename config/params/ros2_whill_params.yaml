@@ -9,7 +9,7 @@ whill/ros2_whill:
     enable_cmd_vel_control: false
     publish_tf: false
     base_frame_id: base_link
-    odom_frame_id: odom
+    odom_frame_id: whill_odom
 
 whill_joy2:
   ros__parameters:

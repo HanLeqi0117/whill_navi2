@@ -15,7 +15,8 @@ from launch_ros.actions import Node, lifecycle_node, lifecycle_transition, Lifec
 from launch_ros.events import lifecycle
 from launch_ros.event_handlers import OnStateTransition
 from lifecycle_msgs.msg import Transition
-        
+from launch.actions.shutdown_action import ShutdownEvent
+
 # input: path of directory.
 # output: list of the directory names in the path
 def list_dirs_in_directory(path=str):
@@ -109,7 +110,7 @@ class DataPath:
             bag_name_list = list_dirs_in_directory(self.bag_dir)
             if len(bag_name_list) > 0:
                 for bag_name in bag_name_list:
-                    if bag_name == bag_name:
+                    if bag_name == self.bag_name:
                         backup_bag_file = bag_name + '_{:%Y_%m_%d_%H_%M_%S}'.format(datetime.datetime.now())
                         if os.path.exists(self.backup_bag_dir):
                             shutil.move(
