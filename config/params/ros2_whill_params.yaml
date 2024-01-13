@@ -4,12 +4,12 @@
 whill/ros2_whill:
   ros__parameters:
     serial_port: /dev/ttyUSB0
-    wheel_radius: 0.135
+    wheel_radius: 0.1325
     send_interval: 20
     enable_cmd_vel_control: false
     publish_tf: false
     base_frame_id: base_link
-    odom_frame_id: whill_odom
+    odom_frame_id: odom
 
 whill_joy2:
   ros__parameters:
@@ -17,7 +17,7 @@ whill_joy2:
     axis_angular: 0
     buttons_deadman: 5  
     scale_angular: 0.8
-    scale_linear: 0.567
+    scale_linear: 2.0
     buttons_stop: 0
     buttons_rotation_R: 5
     buttons_rotation_L: 2
@@ -25,7 +25,7 @@ whill_joy2:
     # if true, permissible to use joystick to control
     use_joycon: true
     # main process rate
-    frequency: 10
+    frequency: 100
     # the duration between the time when LB and RB is pressed
     pressed_duration: 2.0
     # Sequentially, front(0 ~ 2): speed, acceleration, deceleration / back(3 ~ 5): speed, acceleration, deceleration / turn(6 ~ 8): speed, acceleration, deceleration

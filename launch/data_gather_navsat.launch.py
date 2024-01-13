@@ -8,6 +8,7 @@ def generate_launch_description():
     kuaro_whill_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
     tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
     rviz_path = get_rviz_path("whill_navi2", "data_gather_navsat_launch.rviz")
+    mapviz_path = get_mapviz_path("whill_navi2", "data_gather_launch.mvc")
     data_path = DataPath()
     data_path.backup_bagfile()
     
@@ -111,8 +112,20 @@ def generate_launch_description():
         name='datagather_rviz2_node',
         arguments=['-d', rviz_path]
     )
-    
-    # Process
+    mapviz_node = Node(
+        package="mapviz",
+        executable="mapviz",
+        parameters=[{"config" : mapviz_path}]
+    )
+    initialize_origin_node = Node(
+        package="swri_transform_util",
+        executable="initialize_origin.py",
+        name="initialize_origin_node",
+        remappings=[
+            ("fix", "ublox/fix")
+        ]
+    )
+        
     ros2bag_record_process = ExecuteProcess(
         cmd=[
             FindExecutable(name='ros2'),
@@ -120,42 +133,53 @@ def generate_launch_description():
         ]
     )
 
-    ## Group
-    # Launch
     launch_group = GroupAction(actions=[
         sensor_launch,
         kuaro_whill_launch,
         tf2_static_launch
     ])
-    # Node
-    node_group = GroupAction(actions=[
-        make_dir_node,
+    dual_ekf_navsat_nodes = GroupAction(actions=[
         ekf_filter_node_local_node,
         ekf_filter_node_global_node,
         navsat_transform_node,
-        rviz2_node
     ])
-    # Action
-    action_group = GroupAction(actions=[
-        node_group,
-        launch_group
+    visualization_tools = GroupAction(actions=[
+        rviz2_node,
+        mapviz_node,
+        initialize_origin_node
     ])
-
-    # Event
-    ros2bag_record_event = RegisterEventHandler(
-        OnProcessStart(
+    
+    # Register Event
+    when_make_dir_exit = RegisterEventHandler(
+        OnProcessExit(
             target_action=make_dir_node,
-            on_start=[
-                LogInfo(msg='Sensors are launched, and then start to record the data.'),
-                TimerAction(
-                    actions=[ros2bag_record_process],
-                    period=0.5
-                )
+            on_exit=[
+                launch_group,
+                dual_ekf_navsat_nodes
+            ]
+        )
+    )
+    when_launch_complete = RegisterEventHandler(
+        OnExecutionComplete(
+            target_action=launch_group,
+            on_completion=[
+                ros2bag_record_process,
+                visualization_tools
+            ]
+        )
+    )
+    when_rviz_exit = RegisterEventHandler(
+        OnProcessExit(
+            target_action=rviz2_node,
+            on_exit=[
+                Shutdown()
             ]
         )
     )
 
     return LaunchDescription([   
-        action_group, 
-        ros2bag_record_event
+        make_dir_node,
+        when_make_dir_exit,
+        when_launch_complete,
+        when_rviz_exit
     ])

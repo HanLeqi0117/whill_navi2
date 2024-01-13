@@ -78,41 +78,44 @@ def generate_launch_description():
             'bag', 'record', '--all', '-o', data_path.bag_path
         ]
     )
-
-    ## Group
-    # Launch
+    
     launch_group = GroupAction(actions=[
         sensor_launch,
         kuaro_whill_launch,
         tf2_static_launch
     ])
-    # Node
-    node_group = GroupAction(actions=[
-        make_dir_node,
-        ekf_odometry_node,
-        rviz2_node
-    ])
-    # Action
-    action_group = GroupAction(actions=[
-        node_group,
-        launch_group
-    ])
-
-    # Event
-    ros2bag_record_event = RegisterEventHandler(
-        OnProcessStart(
+    
+    # Register Event
+    when_make_dir_complete = RegisterEventHandler(
+        OnProcessExit(
             target_action=make_dir_node,
-            on_start=[
-                LogInfo(msg='Sensors are launched, and then start to record the data.'),
-                TimerAction(
-                    actions=[ros2bag_record_process],
-                    period=0.5
-                )
+            on_exit=[
+                launch_group,
+                ekf_odometry_node
+            ]
+        )
+    )
+    when_launch_complete = RegisterEventHandler(
+        OnExecutionComplete(
+            target_action=launch_group,
+            on_completion=[
+                ros2bag_record_process,
+                rviz2_node
+            ]
+        )
+    )
+    when_rviz_exit = RegisterEventHandler(
+        OnProcessExit(
+            target_action=rviz2_node,
+            on_exit=[
+                Shutdown()
             ]
         )
     )
 
-    return LaunchDescription([   
-        action_group, 
-        ros2bag_record_event
+    return LaunchDescription([  
+        make_dir_node, 
+        when_make_dir_complete,
+        when_launch_complete,
+        when_rviz_exit
     ])

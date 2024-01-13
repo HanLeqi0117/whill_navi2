@@ -9,9 +9,9 @@ show_status_bar: true
 show_capture_tools: true
 window_width: 960
 window_height: 894
-view_scale: 20.0  # 0.276183993
-offset_x: 51.3192291
-offset_y: -1.24216652
+view_scale: 0.178686634
+offset_x: -28.5734997
+offset_y: 34.2853394
 use_latest_transforms: true
 background: "#a0a0a4"
 image_transport: raw
@@ -28,108 +28,77 @@ displays:
   - type: mapviz_plugins/point_click_publisher
     name: new display
     config:
-      visible: true
-      collapsed: false
+      visible: false
+      collapsed: true
       topic: clicked_point
       output_frame: wgs84
   - type: mapviz_plugins/tf_frame
     name: new display
     config:
       visible: true
-      collapsed: false
+      collapsed: true
       frame: base_link
-      color: "#00ff00"
+      color: "#ff0004"
       draw_style: arrows
       position_tolerance: 0
       buffer_size: 1
       static_arrow_sizes: true
       arrow_size: 56
   - type: mapviz_plugins/navsat
-    name: new display
+    name: gps_fix
     config:
       visible: true
-      collapsed: false
+      collapsed: true
       topic: ublox/fix
       color: "#55ffff"
       draw_style: lines
       position_tolerance: 0
-      buffer_size: 10000
+      buffer_size: 10000000
   - type: mapviz_plugins/odometry
-    name: new display
+    name: gps_odometry
     config:
       visible: true
-      collapsed: false
+      collapsed: true
+      topic: /odometry/gps
+      color: "#ffff00"
+      draw_style: lines
+      position_tolerance: 5
+      buffer_size: 10000000
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0.10000000000000001
+  - type: mapviz_plugins/odometry
+    name: local_odometry
+    config:
+      visible: true
+      collapsed: true
+      topic: /odometry/filtered/local
+      color: "#5500ff"
+      draw_style: lines
+      position_tolerance: 5
+      buffer_size: 10000000
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0.10000000000000001
+  - type: mapviz_plugins/odometry
+    name: global_odometry
+    config:
+      visible: true
+      collapsed: true
       topic: /odometry/filtered/global
       color: "#00ff00"
-      draw_style: points
-      position_tolerance: 0
-      buffer_size: 0
+      draw_style: lines
+      position_tolerance: 5
+      buffer_size: 10000000
       show_laps: false
       show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 1
-      show_timestamps: 0
-  - type: mapviz_plugins/odometry
-    name: new display
-    config:
-      visible: true
-      collapsed: false
-      topic: /odometry/gps
-      color: "#ffff00"
-      draw_style: lines
-      position_tolerance: 0
-      buffer_size: 10000000
-      show_laps: false
-      show_covariance: false
-      show_all_covariances: false
-      static_arrow_sizes: false
-      arrow_size: 25
-      show_timestamps: 0
-  - type: mapviz_plugins/odometry
-    name: new display
-    config:
-      visible: true
-      collapsed: false
-      topic: /odometry/filtered/local
-      color: "#5500ff"
-      draw_style: lines
-      position_tolerance: 0
-      buffer_size: 10000000
-      show_laps: false
-      show_covariance: false
-      show_all_covariances: false
-      static_arrow_sizes: false
-      arrow_size: 25
-      show_timestamps: 0
-  - type: mapviz_plugins/odometry
-    name: new display
-    config:
-      visible: true
-      collapsed: false
-      topic: /odometry/filtered/local
-      color: "#ff0000"
-      draw_style: lines
-      position_tolerance: 0
-      buffer_size: 10000000
-      show_laps: false
-      show_covariance: false
-      show_all_covariances: false
-      static_arrow_sizes: false
-      arrow_size: 25
-      show_timestamps: 0
-  - type: mapviz_plugins/laserscan
-    name: new display
-    config:
-      visible: true
-      collapsed: false
-      topic: /scan
-      size: 3
-      buffer_size: 6000
-      alpha: 1
-      color_transformer: Flat Color
-      min_color: "#ffffff"
-      max_color: "#000000"
-      value_min: 0
-      value_max: 100
-      use_rainbow: false
+      show_timestamps: 0.10000000000000001
