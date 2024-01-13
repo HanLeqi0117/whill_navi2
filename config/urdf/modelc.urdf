@@ -273,15 +273,14 @@
     </joint> -->
 
     <!-- IMU -->
-    <link name="imu">
+    <link name="imu_whill">
     </link>
-
 
     <joint name="imu_joint" type="fixed">
         <axis xyz="0 1 0" />
         <origin xyz="0.02 0 0.05" rpy="0 0.85521133347 3.14159265359"/>
         <parent link="base_link"/>
-        <child link="imu"/>
+        <child link="imu_whill"/>
     </joint>
 
 
