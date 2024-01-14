@@ -181,9 +181,9 @@ ekf_filter_node:
         imu0_config: [false, false, false,
                       false, false, true,
                       false, false, false,
-                      false, false, true,
+                      false, false, false,
                       false, false, false]
-        imu0_differential: true  # false(default)
+        imu0_differential: false  # false(default)
         imu0_relative: false  # false(default)
         imu0_queue_size: 20  # 5(default)
         imu0_pose_rejection_threshold: 0.8                 # 0.8(default) Note the difference in parameter names
@@ -199,9 +199,9 @@ ekf_filter_node:
         imu1_config: [false, false, false,
                       false, false, true,
                       false, false, false,
-                      false, false, true,
+                      false, false, false,
                       false, false, false]
-        imu1_differential: true  # false(default)
+        imu1_differential: false  # false(default)
         imu1_relative: false  # false(default)
         imu1_queue_size: 20  # 5(default)
         imu1_pose_rejection_threshold: 0.8                 # 0.8(default) Note the difference in parameter names

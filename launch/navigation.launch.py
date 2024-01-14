@@ -8,6 +8,7 @@ def generate_launch_description():
     tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
     navigation_launch_path = get_include_launch_path("whill_navi2", "navigation_launch.py")
     nav2_params_yaml_path = get_yaml_path("whill_navi2", "nav2_params.yaml")
+    ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_node_params.yaml")
     navigation_rviz_path = get_rviz_path("whill_navi2", "navigation.rviz")
     
 ##############################################################################################
@@ -78,6 +79,14 @@ def generate_launch_description():
         ]
     )
     
+    # Parameter YAML file: config/param/ekf_node_params.yaml
+    ekf_odometry_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        parameters=[ekf_params_yaml_path]
+    )        
+    
     navigation_rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -91,8 +100,11 @@ def generate_launch_description():
             target_action=navigation_rviz_node,
             on_start=[
                 TimerAction(
-                    actions=[launch_group],
-                    period=0.5
+                    actions=[
+                        launch_group,
+                        ekf_odometry_node
+                    ],
+                    period=0.2
                 )
             ]
         )

@@ -38,15 +38,17 @@ def generate_launch_description():
     log_level = LaunchConfiguration('log_level')
     map_path = LaunchConfiguration('map_path')
 
-    lifecycle_nodes = ['controller_server',
-                       'smoother_server',
-                       'planner_server',
-                       'behavior_server',
-                       'bt_navigator',
-                       'waypoint_follower',
-                       'velocity_smoother',
-                       'map_server',
-                       'amcl']
+    lifecycle_nodes = [
+        'map_server',
+        'controller_server',
+        'smoother_server',
+        'planner_server',
+        'behavior_server',
+        'bt_navigator',
+        'waypoint_follower',
+        'velocity_smoother',
+        'amcl'
+    ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # In case of the transforms (tf), currently, there doesn't seem to be a better alternative

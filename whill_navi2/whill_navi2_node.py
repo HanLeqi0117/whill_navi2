@@ -168,7 +168,7 @@ class WhillNavi2Node(BasicNavigator):
     def waypoint_num_nearby(transform = TransformStamped) -> int:
         pass
     
-    def get_goal_poses(self, waypoints = [Waypoint]) -> [PoseStamped]:
+    def get_goal_poses(self, waypoints = [Waypoint()]) -> [PoseStamped]:
         goal_poses = []
         goal_pose = PoseStamped()    
         for waypoint in waypoints:
@@ -179,7 +179,7 @@ class WhillNavi2Node(BasicNavigator):
         
         return goal_poses
     
-    def whill_go(self, goal_poses = [PoseStamped], dist_thread = float):
+    def whill_go(self, goal_poses = [PoseStamped]):
         
         while self.followWaypoints(goal_poses):
             transform_now = self.get_tf("base_link", "map", Time(seconds=0, nanoseconds=0))
