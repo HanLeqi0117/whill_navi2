@@ -67,7 +67,7 @@ def generate_launch_description():
     rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
-        name='datagather_rviz2_node',
+        name='data_gather_rviz2_node',
         arguments=['-d', rviz_path]
     )
     
