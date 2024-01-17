@@ -1,141 +1,89 @@
 from whill_navi2.modules.ros2_launch_utils import *
 
 def generate_launch_description():
-    
+
     data_path = DataPath()
-    sensor_launch_path = get_include_launch_path("whill_navi2", "sensor.launch.py")
-    kuaro_launch_path = get_include_launch_path("whill_navi2", "kuaro_whill.launch.py")
-    tf2_static_launch_path = get_include_launch_path("whill_navi2", "tf2_static.launch.py")
-    navigation_launch_path = get_include_launch_path("whill_navi2", "navigation_launch.py")
-    nav2_params_yaml_path = get_yaml_path("whill_navi2", "nav2_params.yaml")
-    ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_node_params.yaml")
-    navigation_rviz_path = get_rviz_path("whill_navi2", "navigation.rviz")
+    rviz_path = get_rviz_path("whill_navi2", "waypoint_editor.rviz")
+    # mapviz_path = get_mapviz_path("whill_navi2", "")
+    read_path, write_path = data_path.get_rewapypoint_path()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
 
-    # Include Launch File
-    # sensor Launch
-    sensor_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(sensor_launch_path),
-        launch_arguments=[
-            ("use_adis_imu", "True"),
-            ("use_wit_imu", "True"),
-            ("use_velodyne", "True"),
-            ("use_ublox", "false"),
-            ("use_hokuyo", "True"),
-            ("use_web_camera", "false"),
-            ("use_realsense_camera", "false"),
-            ("use_zed_camera", "false")
-        ]
-    )
+    ld = LaunchDescription()
+    mode = LaunchConfiguration("mode")
+    declare_mode = DeclareLaunchArgument(name="mode", default_value="SLAM", description="SLAM or GPS")
+    ld.add_action(declare_mode)
     
-    # kuaro_whill Launch
-    # Parameter YAML file: config/param/ros2_whill_params.yaml
-    # Parameter YAML file: config/param/whill_joy2_params.yaml
-    kuaro_whill_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(kuaro_launch_path)
+    # Node
+    waypoint_editor_rviz2_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="waypoint_editor_rviz2",
+        arguments=["-d", rviz_path],
+        output="screen"
     )
+    ld.add_action(waypoint_editor_rviz2_node)
     
-    # tf2_static Launch
-    tf2_static_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(tf2_static_launch_path),
-        launch_arguments=[
-            ("hokuyo_frame", "laser_front"),
-            ("velodyne_frame", "velodyne"),
-            ("adis_imu_frame", "imu_adis"),
-            ("wit_imu_frame", "imu_wit"),
-            ("ublox_frame", "ublox"),
-            ("whill_frame", "base_link")
-        ]
-    )
-    
-    # navigation launch
-    navigation_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(navigation_launch_path),
-        launch_arguments=[
-            ("use_sim_time", "False"),
-            ("autostart", "true"),
-            ("use_composition", "False"),
-            ("use_respawn", "False"),
-            ("log_level", "info"),
-            ("container_name", "nav2_container"),
-            ("namespace", ""),
-            ("params_file", nav2_params_yaml_path),
-            ("map_path", os.path.join(
-                data_path.remap_dir,
-                data_path.remap_name + '.yaml'
-            ))
-        ]
-    )
-    
-    launch_group = GroupAction(
-        actions=[
-            # sensor_launch,
-            # kuaro_whill_launch,
-            # tf2_static_launch,
-            navigation_launch
-        ]
-    )
-    
-    # Parameter YAML file: config/param/ekf_node_params.yaml
-    ekf_odometry_node = Node(
-        package='robot_localization',
-        executable='ekf_node',
-        name='ekf_filter_node',
-        parameters=[ekf_params_yaml_path]
-    )
-    print_marker_node = Node(
-        package='waypoint_pkg',
-        executable='rewaypoint_loader',
+    waypoint_editor_node = Node(
+        package="gps_wp_pkg",
+        executable="waypoint_editor",
+        name="waypoint_editor",
         parameters=[{
-            'reway_txt_file' : data_path.get_rewapypoint_path()[0]
+            "read_file_name": read_path,
+            "write_file_name": write_path  
+        }],
+        output="screen"
+    )
+    lifecycle_manager_node = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        parameters=[{
+            'autostart' : True,
+            'node_names' : ['map_server']
         }]
     )
-    
-    navigation_rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='navigation_rviz',
-        arguments=['-d', navigation_rviz_path],
+    # Lifecycle Node
+    map_server_lifecycle_node = LifecycleNode(
+        package="nav2_map_server",
+        executable="map_server",
+        name="map_server",
+        namespace="",
+        parameters=[{
+            "yaml_filename": os.path.join(
+                data_path.remap_dir,
+                data_path.remap_name + '.yaml'
+            )
+        }],
         output="screen"
+    )
+    map_action = GroupAction(
+        actions=[
+            map_server_lifecycle_node,
+            lifecycle_manager_node
+        ],
+        condition=IfCondition(EqualsSubstitution(mode, "SLAM"))
     )
     
     when_rviz_start = RegisterEventHandler(
         OnProcessStart(
-            target_action=navigation_rviz_node,
+            target_action=waypoint_editor_rviz2_node,
             on_start=[
-                launch_group,
-                ekf_odometry_node,
-                print_marker_node
+                waypoint_editor_node,
+                map_action
             ]
         )
     )
-    when_rviz_over = RegisterEventHandler(
-        OnProcessExit(
-            target_action=navigation_rviz_node,
-            on_exit=[
-                Shutdown(reason='rviz is closed!')
-            ]
-        )
-    )
-    
-    ld = LaunchDescription()
-    ld.add_action(navigation_rviz_node)
     ld.add_action(when_rviz_start)
-    ld.add_action(when_rviz_over)
-
-    # when_nav2_started = RegisterEventHandler(
-    #     OnProcessStart(
-    #         target_action=nav2_node_group,
-    #         on_start=[
-    #             # navigation
-    #         ]
-    #     )
-    # )
+    when_rviz_exit = RegisterEventHandler(
+        OnProcessExit(
+            target_action=waypoint_editor_rviz2_node,
+            on_exit=[
+                Shutdown()
+            ]
+        )
+    )
+    ld.add_action(when_rviz_exit)
     
-    # ld.add_action(when_nav2_started)
-
     return ld
-    

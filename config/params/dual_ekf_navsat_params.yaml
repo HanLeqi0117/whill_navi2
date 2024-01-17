@@ -20,7 +20,7 @@ ekf_filter_node_local:
     odom0_config: [true, true, false,
                   false, false, false,
                   true, false, false,
-                  false, false, true,
+                  false, false, false,
                   false, false, false]
     odom0_queue_size: 20  # 10
     odom0_differential: true  # false
@@ -29,11 +29,11 @@ ekf_filter_node_local:
     # adis16465
     imu0: adis/imu/data
     imu0_config: [false, false, false,
-                  false, false, true,
+                  false, false, false,
                   false, false, false,
                   false, false, true,
-                  false,  false, false]
-    imu0_differential: true  # false
+                  true, false, false]
+    imu0_differential: false  # false
     imu0_relative: false  # false
     imu0_queue_size: 20  # 10
     imu0_remove_gravitational_acceleration: true
@@ -44,7 +44,7 @@ ekf_filter_node_local:
                   false, false, true,
                   false, false, false,
                   false, false, true,
-                  false, false, false]
+                  true, false, false]
     imu1_differential: true  # false
     imu1_relative: false  # false
     imu1_queue_size: 20  # 10
@@ -61,8 +61,8 @@ ekf_filter_node_global:
     frequency: 30.0
     sensor_timeout: 0.1
     two_d_mode: true
-    transform_time_offset: 0.5
-    transform_timeout: 0.5
+    transform_time_offset: 0.0
+    transform_timeout: 0.0
     print_diagnostics: true
     debug: false
 
@@ -76,7 +76,7 @@ ekf_filter_node_global:
     odom0_config: [true, true, false,
                   false, false, false,
                   true, false, false,
-                  false, false, true,
+                  false, false, false,
                   false, false, false]
     odom0_queue_size: 20  # 10
     odom0_differential: true  # false
@@ -96,11 +96,11 @@ ekf_filter_node_global:
     # adis16465
     imu0: adis/imu/data
     imu0_config: [false, false, false,
-                  false, false, true,
+                  false, false, false,
                   false, false, false,
                   false, false, true,
-                  false, false, false]
-    imu0_differential: true  # false
+                  true, false, false]
+    imu0_differential: false  # false
     imu0_relative: false  # false
     imu0_queue_size: 20  # 10
     imu0_remove_gravitational_acceleration: true
@@ -111,7 +111,7 @@ ekf_filter_node_global:
                   false, false, true,
                   false, false, false,
                   false, false, true,
-                  false, false, false]
+                  true, false, false]
     imu1_differential: true  # false
     imu1_relative: false  # false
     imu1_queue_size: 20  # 10

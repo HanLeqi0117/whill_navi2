@@ -1,12 +1,5 @@
-import rclpy, os
-
-from rclpy.node import Node
-from rclpy.time import Time
-from rclpy.duration import Duration
-from tf2_geometry_msgs import TransformStamped, PoseStamped
-from tf2_ros import TransformListener, Buffer
+from gps_wp_pkg.waypoint_utils.utils import *
 from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
-from waypoint_pkg_interfaces.msg import Waypoint
 from whill_navi2.modules.ros2_launch_utils import get_package_prefix, DataPath
 
 class NaviMode:
@@ -47,7 +40,7 @@ class WhillNavi2Node(BasicNavigator):
         super().__init__(node_name="whill_navi2_node")
         self._tf_buffer_ = Buffer()
         self._tf_listener_ = TransformListener(self._tf_buffer_, self)
-        self._waypoints_list_ = list[Waypoint]()
+        self._waypoints_list_ = []
         self._now_mode_ = NaviMode()
         sound_list_dir = os.path.join(
             get_package_prefix("whill_navi2"), '..', '..', 
@@ -112,42 +105,35 @@ class WhillNavi2Node(BasicNavigator):
         ).get_parameter_value().double_value
                 
         with open(self._read_file_, 'r') as f:
-            wp_tmp = Waypoint
-            for line in f.readlines():
-                if line.count(',') == 7:
-                    line.strip('\n')
-                    token_list = line.split(',')
-                    float_list = []
-                    for token in token_list:
-                        float_list.append(float(token))
-                    pose_tmp = PoseStamped()
-                    wp_tmp.pose = pose_tmp.pose
-                    wp_tmp.pose.position.x = float_list[0]
-                    wp_tmp.pose.position.y = float_list[1]
-                    wp_tmp.pose.position.z = float_list[2]
-                    wp_tmp.pose.orientation.x = float_list[3]
-                    wp_tmp.pose.orientation.y = float_list[4]
-                    wp_tmp.pose.orientation.z = float_list[5]
-                    wp_tmp.pose.orientation.w = float_list[6]
-                    wp_tmp.mode = int(float_list[7])
-                    
+            wp_tmp = Waypoint()
+            waypoints_data = ruamel.yaml.safe_load(f)["waypoints"]
+            
+            for waypoint in waypoints_data:
+                wp_tmp.pose.position.x = waypoint['pose_x']
+                wp_tmp.pose.position.y = waypoint['pose_y']
+                wp_tmp.pose.position.z = waypoint['pose_z']
+                wp_tmp.pose.orientation.x = waypoint['quat_x']
+                wp_tmp.pose.orientation.y = waypoint['quat_y']
+                wp_tmp.pose.orientation.z = waypoint['quat_z']
+                wp_tmp.pose.orientation.w = waypoint['quat_w']
+                wp_tmp.fix.longitude = waypoint['longitude']
+                wp_tmp.fix.latitude = waypoint['latitude']
+                wp_tmp.mode = waypoint['mode']
+                
+                self._waypoints_list_.append(wp_tmp)
+                
         self.get_logger().info("Get waypoint file")
         self._now_mode_.reference_waypoint_now = self._now_mode_.referenced_waypoint_past = self._start_point_
-        self._now_mode_.last_point = len(self._waypoints_list_) - 1
         self._now_mode_.reset()
         
         # self._sub_object_ = self.create_subscription()
         # self._pub_sound_ = self.create_publisher()
-        # self._map_change_ = self.create_publisher()
-        
-        while not self.wait_for_node("amcl", 5.0):
-            self.get_logger().info("Waiting for the localizer...")
-        
+        # self._map_change_ = self.create_publisher()        
             
     def get_tf(self, 
-               source_frame = str, 
-               target_frame = str, 
-               tf_stamp = Time
+               source_frame = str(), 
+               target_frame = str(), 
+               tf_stamp = Time()
         ) -> TransformStamped:
         
         if self._tf_buffer_.can_transform(target_frame, source_frame, tf_stamp, Duration(nanoseconds=int(1e8))):
@@ -193,7 +179,9 @@ class WhillNavi2Node(BasicNavigator):
     
     
     def run(self):
+        self.waitUntilNav2Active(localizer="amcl")
         self.get_logger().info("ready to go")
+        
         while rclpy.ok():
             waypoints = list[Waypoint]()
             transform_now = TransformStamped()
@@ -219,7 +207,7 @@ def main(args=None):
     rclpy.init(args=args)
     node = WhillNavi2Node()
     node.run()
-    rclpy.spin(node)
+    # rclpy.spin(node)
     rclpy.shutdown()
 
 if __name__ == '__main__':

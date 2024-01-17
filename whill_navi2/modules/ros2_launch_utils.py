@@ -125,12 +125,12 @@ class DataPath:
                             )
                             
     def get_rewapypoint_path(self):
-        paths = list_files_in_directory(self.rewaypoint_dir)
-        if len(paths) == 0:
+        files = list_files_in_directory(self.rewaypoint_dir)
+        if len(files) == 0:
             read_path = self.waypoint_path
             write_path = os.path.join(self.rewaypoint_dir, '1_' + self.rewaypoint_name)
         else:
-            path_num = len(paths)
+            path_num = len(files)
             read_path = os.path.join(self.rewaypoint_dir, str(path_num) + '_' + self.rewaypoint_name)
             write_path = os.path.join(self.rewaypoint_dir, str(path_num + 1) + '_' + self.rewaypoint_name)
         

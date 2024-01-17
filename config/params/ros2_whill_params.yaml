@@ -29,9 +29,10 @@ whill_joy2:
     frequency: 100
     # the duration between the time when LB and RB is pressed
     pressed_duration: 2.0
-    # Sequentially, front(0 ~ 2): speed, acceleration, deceleration / back(3 ~ 5): speed, acceleration, deceleration / turn(6 ~ 8): speed, acceleration, deceleration
+    # when the navigation start, which speed_profile_config should be set as the max speed of whill.
+    # Sequentially, front(0 ~ 2): speed, acceleration, deceleration / reverse(3 ~ 5): speed, acceleration, deceleration / turn(6 ~ 8): speed, acceleration, deceleration
     # speed rad/s acceleration rad/ss deceleration rad/ss (Motor)
-    # whill speed = motor speed * the radius(default: 0.1325m) of tire
+    # when speed is set to 30, the speed fo whill is 3.0 km/h 
     # Speed limit: 8 ~ 60
     # Acceleration limit: 10 ~ 90
     # Deceleration limit: 10 ~ 160
@@ -41,7 +42,10 @@ whill_joy2:
       30, 16, 82, 20, 16, 64, 15, 56, 72,
       45, 16, 90, 20, 24, 64, 18, 56, 72,
       57, 16, 90, 20, 24, 64, 14, 28, 64,
-      15, 16, 64, 10, 16, 56, 10, 56, 72
     ]
-    # default speed mode. limit: 0 ~ 6
-    speed_mode: 3
+    # begin with 0. for example, 0, 1, 2, 3, etc.
+    speed_config: 2
+
+    # speed mode 0 ~ 3 for Whill Joystick.
+    # speed mode 4 is for RS232
+    # speed mode 5 is for Phone

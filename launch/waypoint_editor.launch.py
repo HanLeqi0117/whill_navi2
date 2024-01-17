@@ -4,12 +4,18 @@ def generate_launch_description():
 
     data_path = DataPath()
     rviz_path = get_rviz_path("whill_navi2", "waypoint_editor.rviz")
+    # mapviz_path = get_mapviz_path("whill_navi2", "")
     read_path, write_path = data_path.get_rewapypoint_path()
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
 
+    ld = LaunchDescription()
+    mode = LaunchConfiguration("mode")
+    declare_mode = DeclareLaunchArgument(name="mode", default_value="SLAM", description="SLAM or GPS")
+    ld.add_action(declare_mode)
+    
     # Node
     waypoint_editor_rviz2_node = Node(
         package="rviz2",
@@ -18,16 +24,15 @@ def generate_launch_description():
         arguments=["-d", rviz_path],
         output="screen"
     )
+    ld.add_action(waypoint_editor_rviz2_node)
+    
     waypoint_editor_node = Node(
-        package="waypoint_pkg",
+        package="gps_wp_pkg",
         executable="waypoint_editor",
         name="waypoint_editor",
         parameters=[{
             "read_file_name": read_path,
-            "write_file_name": write_path,
-            "save_service_name": "save_service",
-            "update_service_name": "update_service",
-            "debug": False    
+            "write_file_name": write_path  
         }],
         output="screen"
     )
@@ -53,56 +58,32 @@ def generate_launch_description():
         }],
         output="screen"
     )
+    map_action = GroupAction(
+        actions=[
+            map_server_lifecycle_node,
+            lifecycle_manager_node
+        ],
+        condition=IfCondition(EqualsSubstitution(mode, "SLAM"))
+    )
     
-    # When rviz is launched, launch the lifecycle_manager to start the lifecycle_nodes automatically
-    when_rviz_launched = RegisterEventHandler(
+    when_rviz_start = RegisterEventHandler(
         OnProcessStart(
             target_action=waypoint_editor_rviz2_node,
             on_start=[
-                lifecycle_manager_node,
-                map_server_lifecycle_node,
-                TimerAction(
-                    actions=[waypoint_editor_node],
-                    period=0.1
-                )
+                waypoint_editor_node,
+                map_action
             ]
         )
     )
-    # When map_server is configured, activate ifself
-    # when_mapserver_configured = RegisterEventHandler(
-    #     OnStateTransition(
-    #         target_lifecycle_node=map_server_lifecycle_node,
-    #         start_state="configuring",
-    #         goal_state="inactive",
-    #         entities=[
-    #             EmitEvent(
-    #                 event=lifecycle.ChangeState(
-    #                     lifecycle_node_matcher=matches_action(map_server_lifecycle_node),
-    #                     transition_id=Transition.TRANSITION_ACTIVATE
-    #                 )
-    #             )
-    #         ]
-    #     )
-    # )
-    # When rviz exit, shutdown RosLaunch
-    when_rviz_over = RegisterEventHandler(
+    ld.add_action(when_rviz_start)
+    when_rviz_exit = RegisterEventHandler(
         OnProcessExit(
             target_action=waypoint_editor_rviz2_node,
             on_exit=[
-                Shutdown(reason='rviz is closed!')
+                Shutdown()
             ]
         )
     )
-    action_group = GroupAction(
-        actions=[
-            when_rviz_launched,
-            # when_mapserver_configured,
-            when_rviz_over
-        ]
-    )
+    ld.add_action(when_rviz_exit)
     
-    return LaunchDescription([        
-        waypoint_editor_rviz2_node,
-        # map_server_lifecycle_node,
-        action_group
-    ])
+    return ld
