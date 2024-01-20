@@ -7,11 +7,11 @@ enable_antialiasing: true
 show_displays: true
 show_status_bar: true
 show_capture_tools: true
-window_width: 960
+window_width: 1920
 window_height: 894
-view_scale: 0.178686634
-offset_x: -28.5734997
-offset_y: 34.2853394
+view_scale: 0.276184112
+offset_x: -27.555727
+offset_y: -2.8494947
 use_latest_transforms: true
 background: "#a0a0a4"
 image_transport: raw
@@ -25,25 +25,24 @@ displays:
         []
       bing_api_key: AjUIFVHQqwaefdwfh3-uLRJViDFU8O798TvavTQtk4nDfDvtAn_Fc18EWXkDB4M2
       source: Bing Maps (terrain)
-  - type: mapviz_plugins/point_click_publisher
-    name: new display
-    config:
-      visible: false
-      collapsed: true
-      topic: clicked_point
-      output_frame: wgs84
   - type: mapviz_plugins/tf_frame
     name: new display
     config:
       visible: true
       collapsed: true
       frame: base_link
-      color: "#ff0004"
+      color: "#00ff00"
       draw_style: arrows
       position_tolerance: 0
       buffer_size: 10
       static_arrow_sizes: true
-      arrow_size: 56
+      arrow_size: 50
+  - type: mapviz_plugins/marker
+    name: new display
+    config:
+      visible: true
+      collapsed: true
+      topic: /waypoint_marker
   - type: mapviz_plugins/navsat
     name: raw_navsat_fix
     config:
@@ -65,12 +64,12 @@ displays:
       position_tolerance: 0.5
       buffer_size: 10000
   - type: mapviz_plugins/odometry
-    name: gps_odometry
+    name: local_odometry
     config:
       visible: true
       collapsed: true
-      topic: /odometry/gps
-      color: "#ffff00"
+      topic: odometry/filtered/local
+      color: "#00ff00"
       draw_style: lines
       position_tolerance: 0.5
       buffer_size: 10000
@@ -81,12 +80,12 @@ displays:
       arrow_size: 25
       show_timestamps: 0
   - type: mapviz_plugins/odometry
-    name: local_odometry
+    name: gps_odometry
     config:
       visible: true
       collapsed: true
-      topic: /odometry/filtered/local
-      color: "#00ff00"
+      topic: odometry/gps
+      color: "#ffff00"
       draw_style: lines
       position_tolerance: 0.5
       buffer_size: 10000
@@ -101,7 +100,7 @@ displays:
     config:
       visible: true
       collapsed: true
-      topic: /odometry/filtered/global
+      topic: odometry/filtered/global
       color: "#ff00ff"
       draw_style: lines
       position_tolerance: 0.5
@@ -110,5 +109,5 @@ displays:
       show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
-      arrow_size: 1
+      arrow_size: 25
       show_timestamps: 0

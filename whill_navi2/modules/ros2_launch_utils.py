@@ -7,7 +7,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, \
                             ExecuteProcess, RegisterEventHandler, LogInfo, \
                             TimerAction, GroupAction, Shutdown, EmitEvent
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, FindExecutable, EqualsSubstitution, NotEqualsSubstitution
+from launch.substitutions import LaunchConfiguration, FindExecutable, EqualsSubstitution, NotEqualsSubstitution, OrSubstitution
 from launch.event_handlers import OnExecutionComplete, OnProcessStart, OnShutdown, OnProcessExit
 from launch.events import matches_action
 from launch.conditions import IfCondition, UnlessCondition

@@ -4,6 +4,7 @@ def generate_launch_description():
 
     data_path = DataPath()
     rviz_path = get_rviz_path("whill_navi2", "waypoint_maker.rviz")
+    mapviz_path = get_mapviz_path("whill_navi2", "waypoint_generator_launch.mvc")
     amcl_params_yaml_path = get_yaml_path("whill_navi2", "amcl_params.yaml")
     
 ##############################################################################################
@@ -42,9 +43,19 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='waypoint_maker_rviz2',
-        arguments=['-d', rviz_path]
+        arguments=['-d', rviz_path],
     )
-    ld.add_action(waypoint_maker_rviz2_node)
+    waypoint_maker_mapviz_node = Node(
+        package="mapviz",
+        executable="mapviz",
+        parameters=[{"config" : mapviz_path}],
+        condition=IfCondition(EqualsSubstitution(mode, "GPS"))
+    )
+    visualization_nodes = GroupAction(actions=[
+        waypoint_maker_mapviz_node,
+        waypoint_maker_rviz2_node
+    ])
+    ld.add_action(visualization_nodes)
     
     # Lifecycle Node
     amcl_lifecycle_node = Node(
