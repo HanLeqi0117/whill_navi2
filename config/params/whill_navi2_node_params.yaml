@@ -1,0 +1,27 @@
+whill_navi2_node:
+  ros__parameters:
+    arrive_distance: 0.2
+    before_gomi_wait_duration: 5.0
+    before_signal_wait_duration: 8.0
+    change_distance: 2.0
+    gomi_list:
+    - Bento
+    - Can
+    - Bottle
+    gomi_wait_duration: 10.0
+    mode: GPS
+    person_name: Michael
+    read_file: /home/han/default.yaml
+    global_frame_id: map
+    base_frame_id : base_link
+    signal_list:
+    - grenn_signal
+    - yellow_signal
+    - red_signal
+    signal_wait_duration: 10.0
+    sound_list:
+    - /home/han/whill_ws_iron/install/whill_navi2/../../src/whill_navi2/doc/sound_list/Find_bento.wav
+    - /home/han/whill_ws_iron/install/whill_navi2/../../src/whill_navi2/doc/sound_list/find_can.wav
+    - /home/han/whill_ws_iron/install/whill_navi2/../../src/whill_navi2/doc/sound_list/find_petbottle.wav
+    start_point: 0
+    waypoints_size: 3

@@ -110,20 +110,11 @@ def generate_launch_description():
         OnExecutionComplete(
             target_action=ros2bag_play_process,
             on_completion=[
-                EmitEvent(event=ShutdownEvent(reason="bag is over"))
+                Shutdown(reason="bag is over")
             ]
         )
     )
     ld.add_action(when_rosbag_over)
-    when_waypoint_maker_exit = RegisterEventHandler(
-        OnProcessExit(
-            target_action=waypoint_maker_node,
-            on_exit=[
-                Shutdown()
-            ]
-        )
-    )
-    ld.add_action(when_waypoint_maker_exit)
     
     return ld
 

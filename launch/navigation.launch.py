@@ -9,12 +9,19 @@ def generate_launch_description():
     navigation_launch_path = get_include_launch_path("whill_navi2", "navigation_launch.py")
     nav2_params_yaml_path = get_yaml_path("whill_navi2", "nav2_params.yaml")
     ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_node_params.yaml")
+    whill_navi2_yaml_path = get_yaml_path("whill_navi2", "whill_navi2_node_params.yaml")
     navigation_rviz_path = get_rviz_path("whill_navi2", "navigation.rviz")
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
 
+    ld = LaunchDescription()
+    mode = LaunchConfiguration("mode")
+    # Set the mode with GPS or SLAM
+    declare_mode = DeclareLaunchArgument(name="mode", default_value="GPS")
+    ld.add_action(declare_mode)
+    
     # Include Launch File
     # sensor Launch
     sensor_launch = IncludeLaunchDescription(
@@ -85,7 +92,19 @@ def generate_launch_description():
         executable='ekf_node',
         name='ekf_filter_node',
         parameters=[ekf_params_yaml_path]
-    )        
+    )
+    whill_navi2_node = Node(
+        package="whill_navi2",
+        executable="whill_navi2_node",
+        name="whill_navi2_node",
+        parameters=[
+            whill_navi2_yaml_path,
+            {
+                "read_file": data_path.get_rewapypoint_path()[0],
+                'mode': mode
+            }
+        ]
+    )
     
     navigation_rviz_node = Node(
         package='rviz2',
@@ -105,6 +124,12 @@ def generate_launch_description():
                         ekf_odometry_node
                     ],
                     period=0.2
+                ),
+                TimerAction(
+                    actions=[
+                        whill_navi2_node
+                    ],
+                    period=0.5
                 )
             ]
         )
@@ -118,7 +143,6 @@ def generate_launch_description():
         )
     )
     
-    ld = LaunchDescription()
     ld.add_action(navigation_rviz_node)
     ld.add_action(when_rviz_start)
     ld.add_action(when_rviz_over)

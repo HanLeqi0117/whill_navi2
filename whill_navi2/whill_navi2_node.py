@@ -62,6 +62,14 @@ class WhillNavi2Node(BasicNavigator):
             "read_file", 
             read_file
         ).get_parameter_value().string_value
+        self._base_frame_id_ = self.declare_parameter(
+            "base_frame_id", 
+            "base_link"
+        ).get_parameter_value().string_value
+        self._global_frame_id_ = self.declare_parameter(
+            "global_frame_id", 
+            "map"
+        ).get_parameter_value().string_value        
         self._mode_ = self.declare_parameter(
             "mode",
             "SLAM",
@@ -207,20 +215,33 @@ class WhillNavi2Node(BasicNavigator):
             mode = "GPS"
         else :
             self.get_logger().warn("Goals Type Error: {}".format(field_types))
-        
-        while not self.isTaskComplete():
-            self.get_logger().info("Navigating to the Goals...")
+            
+        self.get_logger().info("Navigating to the Goals...")
+
+        while rclpy.ok():
             self.get_clock().sleep_for(Duration(nanoseconds=int(5e8)))
-            transform_now = self.get_tf("base_link", "map", Time())
+            transform_now = self.get_tf(self._base_frame_id_, self._global_frame_id_, Time())
+            if self._waypoints_left_ < self._waypoints_size_:
+                waypoints_size = self._waypoints_left_
+            else:
+                waypoints_size = self._waypoints_size_
             if mode == "SLAM" : 
-                dist = self.calc_dist(goal_poses[self._waypoints_size_ - 1], transform_now)
+                dist = self.calc_dist(goal_poses[waypoints_size - 1], transform_now)
+                pass
             elif mode == "GPS" :
                 dist = get_dist_between_geos(
-                    goal_poses[self._waypoints_size_ - 1]["latitude"],
-                    goal_poses[self._waypoints_size_ - 1]["longitude"],
+                    goal_poses[waypoints_size - 1].position.latitude,
+                    goal_poses[waypoints_size - 1].position.longitude,
                     self._navsat_fix_data_.latitude,
                     self._navsat_fix_data_.longitude
                 )
+                # print(
+                #     goal_poses[waypoints_size - 1].position.latitude,
+                #     goal_poses[waypoints_size - 1].position.longitude,
+                #     self._navsat_fix_data_.latitude,
+                #     self._navsat_fix_data_.longitude,
+                #     dist                    
+                # )
             
             if dist < self._arrive_distance_:
                 self.cancelTask()
@@ -241,13 +262,13 @@ class WhillNavi2Node(BasicNavigator):
         
         while rclpy.ok():
             waypoints = []
-                   
-            waypoint_remain = len(self._waypoints_['waypoints'])
-            if waypoint_remain > self._waypoints_size_:
+            
+            self._waypoints_left_ = len(self._waypoints_['waypoints'])
+            if self._waypoints_left_ > self._waypoints_size_:
                 for index in range(self._waypoints_size_):
                     waypoints.append(self._waypoints_['waypoints'].pop(0))
             else:
-                for index in range(waypoint_remain):
+                for index in range(self._waypoints_left_):
                     waypoints.append(self._waypoints_['waypoints'].pop(0))
                     self._now_mode_.is_last_point = True
 

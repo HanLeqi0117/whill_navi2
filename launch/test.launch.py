@@ -1,89 +1,78 @@
 from whill_navi2.modules.ros2_launch_utils import *
 
 def generate_launch_description():
-
-    data_path = DataPath()
-    rviz_path = get_rviz_path("whill_navi2", "waypoint_editor.rviz")
-    # mapviz_path = get_mapviz_path("whill_navi2", "")
-    read_path, write_path = data_path.get_rewapypoint_path()
     
+    whill_params_yaml_path = get_yaml_path("whill_navi2", "ros2_whill_params.yaml")
+
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
 ##############################################################################################
 
-    ld = LaunchDescription()
-    mode = LaunchConfiguration("mode")
-    declare_mode = DeclareLaunchArgument(name="mode", default_value="SLAM", description="SLAM or GPS")
-    ld.add_action(declare_mode)
+    # Argument
+    use_joycon_arg = DeclareLaunchArgument(name="use_joycon", default_value='true')
     
     # Node
-    waypoint_editor_rviz2_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="waypoint_editor_rviz2",
-        arguments=["-d", rviz_path],
-        output="screen"
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',                                # パッケージの名前
+        executable='robot_state_publisher',                             # 実行ファイルの名前
+        name='robot_state_publisher',                                   # ノードの名前
+        arguments=[get_urdf_path("whill_navi2", "modelc.urdf")],        # Nodeに与える引数、
+        remappings=[('joint_states', 'whill/states/jointState')],       # トピックのremap
+        output='screen'                                                 # ログをコンソール画面に出力する
     )
-    ld.add_action(waypoint_editor_rviz2_node)
-    
-    waypoint_editor_node = Node(
-        package="gps_wp_pkg",
-        executable="waypoint_editor",
-        name="waypoint_editor",
-        parameters=[{
-            "read_file_name": read_path,
-            "write_file_name": write_path  
-        }],
-        output="screen"
-    )
-    lifecycle_manager_node = Node(
-        package='nav2_lifecycle_manager',
-        executable='lifecycle_manager',
-        parameters=[{
-            'autostart' : True,
-            'node_names' : ['map_server']
-        }]
-    )
-    # Lifecycle Node
-    map_server_lifecycle_node = LifecycleNode(
-        package="nav2_map_server",
-        executable="map_server",
-        name="map_server",
-        namespace="",
-        parameters=[{
-            "yaml_filename": os.path.join(
-                data_path.remap_dir,
-                data_path.remap_name + '.yaml'
-            )
-        }],
-        output="screen"
-    )
-    map_action = GroupAction(
-        actions=[
-            map_server_lifecycle_node,
-            lifecycle_manager_node
+    # Parameter YAML file: config/param/ros2_whill_params.yaml
+    ros2_whill_node = Node(
+        package='ros2_whill',
+        executable='ros2_whill',
+        name='ros2_whill',
+        output='screen',
+        namespace='whill',
+        remappings=[
+            ("odom", "odometry")
         ],
-        condition=IfCondition(EqualsSubstitution(mode, "SLAM"))
+        parameters=[whill_params_yaml_path]
+    )
+    # joy_node = Node(
+    #     package='joy',
+    #     executable='joy_node',
+    #     name='joy_node',
+    #     remappings=[
+    #         ("joy", "whill/controller/joy")
+    #     ],
+    #     output='screen'
+    # )
+    joy_node = Node(
+        package='joy',
+        executable='joy_node',
+        name='joy_node',
+        output='screen'
+    )
+    # Parameter YAML file: config/param/whill_joy2_params.yaml
+    whill_joy2_node = Node(
+        package='ros2_whill',
+        executable='whill_joy2',
+        output='screen',
+        parameters=[
+            whill_params_yaml_path,
+            {"use_joycon" : LaunchConfiguration("use_joycon")}
+        ],
+        remappings=[
+            ('joy_state', 'joy'),
+            ('controller/joy', 'whill/controller/joy'),
+            ('controller/cmd_vel', 'vel_to_joy/cmd_vel'),
+            ('speed_profile', 'whill/speed_profile'),
+            ('set_speed_profile_srv', 'whill/set_speed_profile_srv')
+        ]
     )
     
-    when_rviz_start = RegisterEventHandler(
-        OnProcessStart(
-            target_action=waypoint_editor_rviz2_node,
-            on_start=[
-                waypoint_editor_node,
-                map_action
-            ]
-        )
-    )
-    ld.add_action(when_rviz_start)
-    when_rviz_exit = RegisterEventHandler(
-        OnProcessExit(
-            target_action=waypoint_editor_rviz2_node,
-            on_exit=[
-                Shutdown()
-            ]
-        )
-    )
-    ld.add_action(when_rviz_exit)
-    
-    return ld
+    node_group = GroupAction(actions=[
+        robot_state_publisher_node,
+        ros2_whill_node,
+        joy_node,
+        whill_joy2_node
+    ])
+            
+    return LaunchDescription([
+        use_joycon_arg,
+        node_group
+    ])
