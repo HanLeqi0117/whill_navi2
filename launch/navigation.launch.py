@@ -10,7 +10,9 @@ def generate_launch_description():
     nav2_params_yaml_path = get_yaml_path("whill_navi2", "nav2_params.yaml")
     ekf_params_yaml_path = get_yaml_path("whill_navi2", "ekf_node_params.yaml")
     whill_navi2_yaml_path = get_yaml_path("whill_navi2", "whill_navi2_node_params.yaml")
+    navsat_ekf_params_yaml_path = get_yaml_path("whill_navi2", "dual_ekf_navsat_params.yaml")
     navigation_rviz_path = get_rviz_path("whill_navi2", "navigation.rviz")
+    mapviz_path = get_mapviz_path("whill_navi2", "waypoint_generator_launch.mvc")
     
 ##############################################################################################
 ####################################### ROS LAUNCH API #######################################
@@ -62,6 +64,7 @@ def generate_launch_description():
     navigation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(navigation_launch_path),
         launch_arguments=[
+            ("mode", mode)
             ("use_sim_time", "False"),
             ("autostart", "True"),
             ("use_composition", "False"),
@@ -91,7 +94,48 @@ def generate_launch_description():
         package='robot_localization',
         executable='ekf_node',
         name='ekf_filter_node',
-        parameters=[ekf_params_yaml_path]
+        parameters=[ekf_params_yaml_path],
+        condition=IfCondition(EqualsSubstitution(mode, "SLAM"))
+    )
+    # Parameter YAML file: config/param/dual_navsat_params.yaml
+    ekf_filter_node_local_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node_local',
+        parameters=[navsat_ekf_params_yaml_path],
+        remappings=[
+            ("odometry/filtered", "odometry/filtered/local")
+        ]
+    )
+    ekf_filter_node_global_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node_global',
+        parameters=[navsat_ekf_params_yaml_path],
+        remappings=[
+            ("odometry/filtered", "odometry/filtered/global"),
+            ("odometry/gps", "odometry/gps"),  
+        ]
+    )
+    navsat_transform_node = Node(
+        package='robot_localization',
+        executable='navsat_transform_node',
+        parameters=[navsat_ekf_params_yaml_path],
+        remappings=[
+            ("gps/fix", "ublox/fix"),
+            ("gps/filtered", "gps/filtered"),
+            ("imu", "witmotion/imu/data"),
+            ("odometry/gps", "odometry/gps"),
+            ("odometry/filtered", "odometry/filtered/global")
+        ]
+    )
+    dual_ekf_navsat_group = GroupAction(
+        actions=[
+            ekf_filter_node_local_node,
+            ekf_filter_node_global_node,
+            navsat_transform_node
+        ],
+        condition=IfCondition(EqualsSubstitution(mode, "GPS"))
     )
     whill_navi2_node = Node(
         package="whill_navi2",
@@ -105,13 +149,26 @@ def generate_launch_description():
             }
         ]
     )
-    
     navigation_rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='navigation_rviz',
         arguments=['-d', navigation_rviz_path],
         output="screen"
+    )
+    # mapviz_node = Node(
+    #     package="mapviz",
+    #     executable="mapviz",
+    #     parameters=[{"config" : mapviz_path}]
+    # )
+    waypoint_display_node = Node(
+        package="gps_wp_pkg",
+        executable="waypoint2marker",
+        name="waypoint_display",
+        parameters=[{
+            "waypoint_read_file" : data_path.get_rewapypoint_path()[0],
+            "until_node" : navigation_rviz_node.node_name
+        }]
     )
     
     when_rviz_start = RegisterEventHandler(
@@ -121,7 +178,9 @@ def generate_launch_description():
                 TimerAction(
                     actions=[
                         launch_group,
-                        ekf_odometry_node
+                        ekf_odometry_node,
+                        dual_ekf_navsat_group,
+                        waypoint_display_node
                     ],
                     period=0.2
                 ),
@@ -129,7 +188,7 @@ def generate_launch_description():
                     actions=[
                         whill_navi2_node
                     ],
-                    period=0.5
+                    period=10.0
                 )
             ]
         )

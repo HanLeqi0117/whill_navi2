@@ -19,7 +19,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import LaunchConfiguration, PythonExpression, EqualsSubstitution
 from launch_ros.actions import LoadComposableNodes, SetParameter
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode, ParameterFile
@@ -37,6 +37,7 @@ def generate_launch_description():
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
     map_path = LaunchConfiguration('map_path')
+    mode = LaunchConfiguration('mode')
 
     lifecycle_nodes = [
         'map_server',
@@ -48,7 +49,7 @@ def generate_launch_description():
         'waypoint_follower',
         'velocity_smoother',
         'amcl'
-    ]
+    ]     
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
@@ -101,6 +102,10 @@ def generate_launch_description():
     declare_map_path_cmd = DeclareLaunchArgument(
         'map_path', default_value=os.path.join(os.environ['HOME'], 'map.yaml'),
         description='log level')
+    
+    declare_mode_cmd = DeclareLaunchArgument(
+        'mode', default_value='GPS', description='set this Argument to GPS or SLAM'
+    )
 
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
@@ -117,6 +122,7 @@ def generate_launch_description():
                     params_file,
                     {'yaml_filename' : map_path}
                 ],
+                condition=IfCondition(EqualsSubstitution(mode, 'SLAM'))
             ),
             Node(
                 package='nav2_amcl',
@@ -126,6 +132,7 @@ def generate_launch_description():
                 respawn=use_respawn,
                 respawn_delay=2.0,
                 parameters=[params_file],
+                condition=IfCondition(EqualsSubstitution(mode, "SLAM"))
             ),
             Node(
                 package='nav2_controller',
@@ -196,7 +203,7 @@ def generate_launch_description():
                 parameters=[params_file],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings +
-                        [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]),
+                        [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'vel_to_joy/cmd_vel')]),
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
@@ -288,5 +295,6 @@ def generate_launch_description():
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
+    ld.add_action(declare_mode_cmd)
 
     return ld

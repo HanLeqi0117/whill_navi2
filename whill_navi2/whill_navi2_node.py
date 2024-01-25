@@ -227,7 +227,6 @@ class WhillNavi2Node(BasicNavigator):
                 waypoints_size = self._waypoints_size_
             if mode == "SLAM" : 
                 dist = self.calc_dist(goal_poses[waypoints_size - 1], transform_now)
-                pass
             elif mode == "GPS" :
                 dist = get_dist_between_geos(
                     goal_poses[waypoints_size - 1].position.latitude,
