@@ -64,7 +64,7 @@ def generate_launch_description():
     navigation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(navigation_launch_path),
         launch_arguments=[
-            ("mode", mode)
+            ("mode", mode),
             ("use_sim_time", "False"),
             ("autostart", "True"),
             ("use_composition", "False"),
@@ -167,7 +167,7 @@ def generate_launch_description():
         name="waypoint_display",
         parameters=[{
             "waypoint_read_file" : data_path.get_rewapypoint_path()[0],
-            "until_node" : navigation_rviz_node.node_name
+            "until_node" : 'navigation_rviz'
         }]
     )
     
