@@ -11,8 +11,9 @@ def generate_launch_description():
     # IMUを起動する
     imu_node = Node(
         package="adi_driver",                                           # パッケージの名前
-        executable="adis16465_node",                                    # 実行ファイルの名前
-        parameters=[adis16465_params_yaml_path],
+        executable="adis16465_node",
+        name="adis16465_node",                                          # 実行ファイルの名前
+        parameters=[adis16465_params_yaml_path,],
         remappings=[
             ("data_raw", "adis/imu/data_raw")
         ],
