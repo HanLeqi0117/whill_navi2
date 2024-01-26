@@ -26,7 +26,7 @@ def generate_launch_description():
             "deg_chord" : 0.5,
             "mode" : mode
         }],
-        arguments=['--ros-args', '--log-level', 'debug'],
+        arguments=['--ros-args', '--log-level', 'info'],
         remappings=[
             ("imu", "witmotion/imu/data"),
             ("fix", "gps/filtered")
@@ -97,7 +97,7 @@ def generate_launch_description():
                 waypoint_maker_node,
                 amcl_map_action,
                 TimerAction(
-                    period=2.0,
+                    period=0.2,
                     actions=[
                         ros2bag_play_process
                     ]

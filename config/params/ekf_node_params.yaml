@@ -90,7 +90,7 @@ ekf_filter_node:
         #                false, false, false,
         #                false, false, true,
         #                false, false, false]
-        odom0_config: [true, true, false,
+        odom0_config: [false, false, false,
                        false, false, false,
                        true, false, false,
                        false, false, false,
@@ -108,7 +108,7 @@ ekf_filter_node:
         # data is converted to velocity data by differentiating the absolute pose measurements. These velocities are then
         # integrated as usual. NOTE: this only applies to sensors that provide pose measurements; setting differential to true
         # for twist measurements has no effect.
-        odom0_differential: true  # false(default)
+        odom0_differential: false  # false(default)
 
         # [ADVANCED] When the node starts, if this parameter is true, then the first measurement is treated as a "zero point"
         # for all future measurements. While you can achieve the same effect with the differential paremeter, the key
@@ -179,16 +179,16 @@ ekf_filter_node:
         # imu0
         imu0: adis/imu/data
         imu0_config: [false, false, false,
-                      false, false, false,
-                      false, false, false,
                       false, false, true,
-                      true, false, false]
+                      false, false, false,
+                      false, false, false,
+                      false, false, false]
         imu0_differential: false  # false(default)
-        imu0_relative: false  # false(default)
+        imu0_relative: true  # false(default)
         imu0_queue_size: 20  # 5(default)
-        imu0_pose_rejection_threshold: 0.8                 # 0.8(default) Note the difference in parameter names
-        imu0_twist_rejection_threshold: 0.8                # 0.8(default)
-        imu0_linear_acceleration_rejection_threshold: 0.8  # 0.8(default)
+        imu0_pose_rejection_threshold: 0.6                 # 0.8(default) Note the difference in parameter names
+        imu0_twist_rejection_threshold: 0.6                # 0.8(default)
+        imu0_linear_acceleration_rejection_threshold: 0.6  # 0.8(default)
 
         # [ADVANCED] Some IMUs automatically remove acceleration due to gravity, and others don't. If yours doesn't, please set
         # this to true, and *make sure* your data conforms to REP-103, specifically, that the data is in ENU frame.
@@ -197,16 +197,16 @@ ekf_filter_node:
         # imu1
         imu1: witmotion/imu/data     
         imu1_config: [false, false, false,
-                      false, false, true,
                       false, false, false,
-                      false, false, true,
-                      true, false, false]
+                      false, false, false,
+                      false, false, false,
+                      false, false, false]
         imu1_differential: false  # false(default)
-        imu1_relative: false  # false(default)
+        imu1_relative: true  # false(default)
         imu1_queue_size: 20  # 5(default)
-        imu1_pose_rejection_threshold: 0.8                 # 0.8(default) Note the difference in parameter names
-        imu1_twist_rejection_threshold: 0.8                # 0.8(default)
-        imu1_linear_acceleration_rejection_threshold: 0.8  # 0.8(default)
+        imu1_pose_rejection_threshold: 0.6                 # 0.8(default) Note the difference in parameter names
+        imu1_twist_rejection_threshold: 0.6                # 0.8(default)
+        imu1_linear_acceleration_rejection_threshold: 0.6  # 0.8(default)
 
         # [ADVANCED] Some IMUs automatically remove acceleration due to gravity, and others don't. If yours doesn't, please set
         # this to true, and *make sure* your data conforms to REP-103, specifically, that the data is in ENU frame.
